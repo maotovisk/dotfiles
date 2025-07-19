@@ -52,11 +52,11 @@ install_package() {
     print_info "Packages installed successfully."
 }
 
-DEPENDENCIES="git base-devel fish"
+DEPENDENCIES="git base-devel fish curl jq wl-clipboard"
 
 HYPRLAND_PACKAGES="hyprland aquamarine xdg-desktop-portal-hyprland hyprpaper hyprland-qtutils hyprlang hyprland-qt-support hyprcursor hyprutils hyprgraphics"
 
-EXTRA_PACKAGES="waybar wofi mako"
+EXTRA_PACKAGES="waybar wofi mako hyprshot"
 
 install_yay() {
     print_info "Installing yay (Yet Another Yaourt)..."

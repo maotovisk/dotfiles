@@ -23,7 +23,7 @@ export XDG_CURRENT_DESKTOP=Hyprland
 ###
 # THIS IS FOR HYPRLAND
 ###
-hyprshot -z -m region -r -- >> "$complete_path"
+grimblast --freeze --cursor copysave area "$complete_path"
 
 ###
 # UNCOMMENT BELOW FOR KDE PLASMA
@@ -64,6 +64,7 @@ url=$(echo "$response" | jq -r '.url')
 
 if [ -z "$url" ] || [ "$url" = "null" ]; then
 	error_msg=$(echo "$response" | jq -r '.error // "Unknown error"')
+	echo $response
 	_notify "Error: Upload failed" "$error_msg"
 else
 	if [ "$XDG_SESSION_TYPE" = "x11" ]; then
