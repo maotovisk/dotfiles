@@ -1,0 +1,75 @@
+#!/bin/bash
+
+app_name="Screenshot Uploader"
+
+# Dependencies: curl, notify-send, xclip, wl-clipboard, jq
+function _notify() {
+	notify-send --expire-time 1000 \
+		--app-name "$app_name" \
+		--icon 'screengrab' \
+		"$1" "$2"
+}
+
+store_directory=/home/$USER/s-ul
+if [[ ! -e $store_directory ]]; then
+	mkdir $store_directory
+fi
+
+current_date=$(date +"%Y-%m-%d %H-%M-%S")
+filename="Screenshot_$current_date.png"
+complete_path="${store_directory}/${filename}"
+
+export XDG_CURRENT_DESKTOP=Hyprland
+###
+# THIS IS FOR HYPRLAND
+###
+hyprshot -z -m region -r -- >> "$complete_path"
+
+###
+# UNCOMMENT BELOW FOR KDE PLASMA
+###
+#spectacle -o /proc/self/fd/1 --region --nonotify >> "$complete_path"
+
+if [[ $(file --mime-type -b "$complete_path") != "image/png" ]]; then
+	rm "$complete_path"
+	_notify "Screenshot aborted" && exit 1
+fi
+
+
+###
+#
+###
+key="$(awk -F= '/^key/ {print $2}' ~/.config/sul-uploader/config.ini)"
+if [ -z "$key" ]; then
+    _notify "Error: API key not found in config.ini"
+    exit 1
+fi
+
+method=POST
+postURL=https://s-ul.eu/api/v1/upload
+wizard=true
+file="$complete_path"
+
+actualsize=$(wc -c <"$file")
+maxsize=209714177
+
+if [ $actualsize -ge $maxsize ]; then
+	_notify "\nSorry, your file is too large to be uploaded. Please try a smaller file.\n"
+fi
+
+_notify 'Uploading screenshot...'
+
+response=$(curl -s -X "$method" "$postURL?key=$key&wizard=$wizard" -F "file=@$file")
+url=$(echo "$response" | jq -r '.url')
+
+if [ -z "$url" ] || [ "$url" = "null" ]; then
+	error_msg=$(echo "$response" | jq -r '.error // "Unknown error"')
+	_notify "Error: Upload failed" "$error_msg"
+else
+	if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+		echo -n "$url" | xclip -selection clipboard
+	else
+		wl-copy "$url"
+	fi
+	_notify 'Success! Screenshot uploaded to:' "$url"
+fi

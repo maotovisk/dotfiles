@@ -1,0 +1,168 @@
+/* Modern Liquid Glass Waybar */
+* {
+    font-family:
+       "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+    border: none;
+}
+
+/* Color Palette - Modern Glass */
+@define-color text           rgba(255, 255, 255, 0.95);
+@define-color text_secondary rgba(255, 255, 255, 0.75);
+@define-color text_muted     rgba(255, 255, 255, 0.6);
+
+@define-color glass_bg       rgba(20, 20, 30, 0.6);
+@define-color glass_border   rgba(255, 255, 255, 0.1);
+@define-color glass_highlight rgba(255, 255, 255, 0.05);
+
+@define-color accent_primary #009AAF;
+@define-color accent_secondary #5856D6;
+@define-color accent_success #30D158;
+@define-color accent_warning #FF9F0A;
+@define-color accent_danger  #FF453A;
+@define-color accent_pink    #FF2D92;
+
+/* Main bar - Glass morphism */
+window#waybar {
+    background: transparent;
+    border: 1px solid transparent;
+    margin: 0;
+    border-radius: 16px;
+    color: @text;
+}
+
+/* Module containers - Glass cards */
+.modules-right,
+.modules-left,
+.modules-center {
+    padding: 4px 8px;
+}
+
+/* Workspaces - Modern pill indicators */
+#workspaces {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+}
+
+#workspaces button {
+    color: @text_muted;
+    padding: 2px 4px;
+    margin: 0 2px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    min-width: 24px;
+}
+
+#workspaces button:hover {
+    color: @text;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#workspaces button.active {
+    color: @accent_primary;
+    background: rgba(0, 122, 255, 0.15);
+    border: 1px solid rgba(0, 122, 255, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+}
+
+#workspaces button.focused {
+    color: @accent_primary;
+    background: rgba(0, 122, 255, 0.1);
+    border: 1px solid rgba(0, 122, 255, 0.15);
+}
+
+/* System modules - Glass pills */
+#cpu,
+#memory,
+#disk,
+#network,
+#pulseaudio,
+#tray,
+#battery {
+    color: @text;
+    padding: 6px 12px;
+    margin: 0 2px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid @glass_border;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+#battery {
+    color: @accent_warning;
+    background: rgba(255, 159, 10, 0.1);
+}
+
+#battery.charging {
+    color: @accent_success;
+    background: rgba(48, 209, 88, 0.1);
+}
+
+#battery.warning:not(.charging) {
+    color: @accent_danger;
+    background: rgba(255, 69, 58, 0.1);
+}
+
+/* Clock - Premium glass card */
+#clock {
+    padding: 8px 16px;
+    margin: 0 4px;
+    color: @text;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-radius: 20px;
+    border: 1px solid @glass_border;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Window title - Subtle glass */
+#window {
+    font-size: 13px;
+    color: @text_secondary;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin: 0 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Modern hover effects */
+#weather:hover,
+#clock:hover,
+#tray:hover,
+#pulseaudio:hover,
+#network:hover,
+#cpu:hover,
+#memory:hover,
+#battery:hover {
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Tooltip styling - Modern glass tooltips */
+tooltip {
+    background: rgba(20, 20, 30, 0.9);
+    border: 1px solid @glass_border;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin: 8px;
+    color: @text;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+tooltip label {
+    color: @text;
+    padding: 8px 12px;
+    font-family: "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
+}

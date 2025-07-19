@@ -1,0 +1,15 @@
+width=670
+height=360
+mode=run
+location=top
+yoffset=20
+filter_rate=144
+matching=contains
+insensitive=true
+term=kitty
+allow_images=true
+allow_markup=false
+dmenu-parse_action=true
+key_down=Tab
+key_expand=Right
+key_forward=Down

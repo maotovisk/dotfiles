@@ -1,0 +1,42 @@
+font=Fira Sans 12
+format=<b>%a</b>\n<span color='#6a6a6a'>%s</span>\n<span color='#6a6a6a'>%b</span>
+sort=-time
+output=DP-1
+layer=overlay
+anchor=top-right
+
+# Background
+background-color=#2D2A2E
+text-color=#F8F8F2
+border-color=#3C3836
+border-size=1
+border-radius=12
+padding=12,16,16
+margin=8
+
+# Size
+width=350
+height=120
+margin=10
+
+[urgency=low]
+background-color=#363A4F
+text-color=#A5ADCB
+
+[urgency=normal]
+background-color=#2D2A2E
+border-color=#3C3836
+
+# Special Categories
+[category=network]
+background-color=#363A4F
+border-color=#78DCE8
+
+[category=music]
+background-color=#363A4F
+border-color=#AB9DF2
+
+[urgency=high]
+background-color=#ff3b30
+format=<b>%a</b>\n<span color='#d2d2d2'>%s</span>\n<span color='#d2d2d2'>%b</span>
+text-color=#ffffff
