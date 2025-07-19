@@ -56,7 +56,7 @@ DEPENDENCIES="git base-devel fish curl jq wl-clipboard"
 
 HYPRLAND_PACKAGES="hyprland aquamarine xdg-desktop-portal-hyprland hyprpaper hyprland-qtutils hyprlang hyprland-qt-support hyprcursor hyprutils hyprgraphics"
 
-EXTRA_PACKAGES="waybar wofi mako hyprshot"
+EXTRA_PACKAGES="waybar wofi mako"
 
 install_yay() {
     print_info "Installing yay (Yet Another Yaourt)..."
@@ -151,6 +151,9 @@ install_deps() {
 
     print_info "Installing yay (AUR helper)..."
     install_yay
+
+    print_info "Installing grimblast..."
+    yay -S --noconfirm grimblast-git
 
     if [ "$DO_COMPLETE_INSTALL" = true ]; then
         install_extras
