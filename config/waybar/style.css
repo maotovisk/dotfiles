@@ -1,48 +1,45 @@
-/* Modern Liquid Glass Waybar */
 * {
-    font-family:
-       "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+    font-family: "JetBrainsMonoNL NFP", "Adwaita Sans", monospace;
+    font-size: 11px;
+    font-weight: 400;
     margin: 0;
     padding: 0;
     min-height: 0;
     border: none;
 }
 
-/* Color Palette - Modern Glass */
-@define-color text           rgba(255, 255, 255, 0.95);
-@define-color text_secondary rgba(255, 255, 255, 0.75);
-@define-color text_muted     rgba(255, 255, 255, 0.6);
+/* Color Palette - Flat Design */
+@define-color text           #ffffff;
+@define-color text_secondary #cccccc;
+@define-color text_muted     #999999;
 
-@define-color glass_bg       rgba(20, 20, 30, 0.6);
-@define-color glass_border   rgba(255, 255, 255, 0.1);
-@define-color glass_highlight rgba(255, 255, 255, 0.05);
+@define-color bg_primary     #1a1a1a;
+@define-color bg_secondary   #2a2a2a;
+@define-color border_color   #333333;
 
-@define-color accent_primary #009AAF;
-@define-color accent_secondary #5856D6;
-@define-color accent_success #30D158;
-@define-color accent_warning #FF9F0A;
-@define-color accent_danger  #FF453A;
-@define-color accent_pink    #FF2D92;
+@define-color accent_primary #0078d4;
+@define-color accent_success #107c10;
+@define-color accent_warning #ff8c00;
+@define-color accent_danger  #d13438;
 
-/* Main bar - Glass morphism */
+/* Main bar - Flat and thin */
 window#waybar {
-    background: transparent;
-    border: 1px solid transparent;
+    background: @bg_primary;
+    border: none;
     margin: 0;
-    border-radius: 16px;
+    padding: 0;
     color: @text;
+    border-bottom: 1px solid @border_color;
 }
 
-/* Module containers - Glass cards */
+/* Module containers - Minimal spacing */
 .modules-right,
 .modules-left,
 .modules-center {
-    padding: 4px 8px;
+    padding: 0 4px;
 }
 
-/* Workspaces - Modern pill indicators */
+/* Workspaces - Flat indicators */
 #workspaces {
     padding: 0;
     margin: 0;
@@ -51,35 +48,31 @@ window#waybar {
 
 #workspaces button {
     color: @text_muted;
-    padding: 2px 4px;
-    margin: 0 2px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
-    min-width: 24px;
+    padding: 4px 8px;
+    margin: 0 1px;
+    border: none;
+    background: transparent;
+    font-weight: 400;
+    min-width: 20px;
 }
 
 #workspaces button:hover {
     color: @text;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
 }
 
 #workspaces button.active {
     color: @accent_primary;
-    background: rgba(0, 122, 255, 0.15);
-    border: 1px solid rgba(0, 122, 255, 0.2);
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+    background: transparent;
+    border-bottom: 1px solid @accent_primary;
 }
 
 #workspaces button.focused {
     color: @accent_primary;
-    background: rgba(0, 122, 255, 0.1);
-    border: 1px solid rgba(0, 122, 255, 0.15);
+    background: transparent;
 }
 
-/* System modules - Glass pills */
+/* System modules - Flat design */
 #cpu,
 #memory,
 #disk,
@@ -88,81 +81,118 @@ window#waybar {
 #tray,
 #battery {
     color: @text;
-    padding: 6px 12px;
-    margin: 0 2px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid @glass_border;
-    transition: all 0.3s ease;
-    font-weight: 500;
+    padding: 4px 8px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    font-weight: 400;
 }
 
 #battery {
     color: @accent_warning;
-    background: rgba(255, 159, 10, 0.1);
 }
 
 #battery.charging {
     color: @accent_success;
-    background: rgba(48, 209, 88, 0.1);
 }
 
 #battery.warning:not(.charging) {
     color: @accent_danger;
-    background: rgba(255, 69, 58, 0.1);
 }
 
-/* Clock - Premium glass card */
+/* Clock - Minimal design */
 #clock {
-    padding: 8px 16px;
-    margin: 0 4px;
+    padding: 4px 12px;
+    margin: 0;
     color: @text;
-    font-weight: 700;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    border-radius: 20px;
-    border: 1px solid @glass_border;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Window title - Subtle glass */
-#window {
-    font-size: 13px;
-    color: @text_secondary;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    margin: 0 4px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Modern hover effects */
-#weather:hover,
-#clock:hover,
-#tray:hover,
-#pulseaudio:hover,
-#network:hover,
-#cpu:hover,
-#memory:hover,
-#battery:hover {
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Tooltip styling - Modern glass tooltips */
-tooltip {
-    background: rgba(20, 20, 30, 0.9);
-    border: 1px solid @glass_border;
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin: 8px;
-    color: @text;
-    font-size: 12px;
     font-weight: 500;
+    background: transparent;
+    border: none;
+}
+
+/* Window title - Subtle */
+#window {
+    font-size: 11px;
+    color: @text_secondary;
+    padding: 4px 8px;
+    background: transparent;
+    margin: 0;
+    border: none;
+}
+
+/* No hover effects for speed */
+#weather,
+#clock,
+#tray,
+#pulseaudio,
+#network,
+#cpu,
+#memory,
+#battery {
+    transition: none;
+}
+
+/* Tooltip styling - Minimal */
+tooltip {
+    background: @bg_primary;
+    border: 1px solid @border_color;
+    padding: 4px 8px;
+    margin: 4px;
+    color: @text;
+    font-size: 10px;
+    font-weight: 400;
 }
 
 tooltip label {
     color: @text;
-    padding: 8px 12px;
-    font-family: "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
+    padding: 4px 8px;
+    font-family: "JetBrainsMonoNL NFP", "Adwaita Sans", monospace;
+}
+
+/* Custom module spacing for maximum efficiency */
+#custom-separator {
+    color: @border_color;
+    padding: 0 2px;
+    margin: 0;
+    font-size: 10px;
+}
+
+/* Network module specific styling */
+#network.disconnected {
+    color: @accent_danger;
+}
+
+#network.wifi {
+    color: @accent_primary;
+}
+
+#network.ethernet {
+    color: @accent_success;
+}
+
+/* Audio module states */
+#pulseaudio.muted {
+    color: @accent_danger;
+}
+
+/* CPU and Memory usage colors */
+#cpu.warning {
+    color: @accent_warning;
+}
+
+#cpu.critical {
+    color: @accent_danger;
+}
+
+#memory.warning {
+    color: @accent_warning;
+}
+
+#memory.critical {
+    color: @accent_danger;
+}
+
+/* Height constraint through padding control */
+window#waybar {
+    padding: 0;
 }
