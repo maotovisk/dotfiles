@@ -1,74 +1,134 @@
-/* Updated Color Palette for Liquid Glass Effect */
-@define-color text           #f8f8f2;
-@define-color subtext1       #e2e2dc;
-@define-color subtext0       #cccccc;
+@define-color bg-primary     #1d1a1e;
+@define-color bg-secondary   #272327;
+@define-color bg-tertiary    #1e1c1e;
+@define-color text-primary   #f8f8f2;
+@define-color text-secondary #e2e2dc;
+@define-color border-color   #3a3a3a;
+@define-color accent-blue    #784cc8;
+@define-color accent-dark    #1d1a1e;
 
-@define-color base           #1d1a1e;
-@define-color mantle         #272327;
-@define-color crust          #1e1c1e;
-
-/* Accents */
-@define-color red           #ff6188;
-@define-color orange        #fc9867;
-@define-color yellow        #ffd866;
-@define-color green         #a9dc76;
-@define-color blue          #78dce8;
-@define-color purple        #ab9df2;
-@define-color pink         #ff9eb7;
-
-@define-color highlight-bg rgba(120, 105, 199, 0.3);
-@define-color glass-base rgba(29, 26, 30, 0.8);
-@define-color glass-crust rgba(90, 88, 91, 0.3);
-@define-color glass-mantle rgba(39, 35, 39, 0.7);
-@define-color glass-highlight rgba(255, 255, 255, 0.1);
+* {
+    margin: 0;
+    padding: 0;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    border-radius: 0;
+    transition: none;
+    animation: none;
+}
 
 window {
-    font-family: "Adwaita Sans";
-    font-size: 14px;
-    width: 670px; /* Fixed typo */
-    height: 360px;
-    border: 1px solid @glass-highlight;
-    border-radius: 10px;
-    background-color: @glass-base;
+    font-family: "Adwaita Sans", "SF Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    width: 580px;
+    height: 280px;
+    background-color: @bg-primary;
+    border: 1px solid @border-color;
+    color: @text-primary;
 }
 
 #input {
-    margin: 10px;
-    border: none;
-    color: @text;
-    padding: 4px 8px;
-    border-radius: 20px;
-    background-color: @glass-crust;
-    border: 1px solid @glass-highlight;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin: 2px;
+    padding: 3px 6px;
+    background-color: @bg-secondary;
+    color: @text-primary;
+    border: 1px solid @border-color;
+    font-size: 12px;
+    font-weight: 500;
+    min-height: 18px;
+}
+
+#input:focus {
+    background-color: @bg-tertiary;
+    border-color: @accent-blue;
 }
 
 #inner-box {
-    padding: 10px;
-    border: none;
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+
+#outer-box {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0;
+    padding: 0;
     background-color: transparent;
 }
 
 #text {
-    border: none;
-    color: @text;
+    color: @text-primary;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0;
 }
 
 #entry {
-    margin-bottom: 5px;
-    border: 1px solid transparent;
-    border-radius: 16px;
-    padding: 6px;
-    height: 30px;
-    max-width: 100%;
-    overflow: hidden;
-    outline: none;
-    text-overflow: ellipsis;
+    margin: 0;
+    padding: 3px 6px;
     background-color: transparent;
+    color: @text-primary;
+    border: none;
+    min-height: 20px;
+    max-height: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+#entry:hover {
+    background-color: @bg-secondary;
 }
 
 #entry:selected {
-    background: @highlight-bg;
-    border: 1px solid @glass-highlight;
-    box-shadow: 0 0 5px @highlight-bg;
+    background-color: @accent-blue;
+    color: @accent-dark;
+}
+
+#entry:selected #text {
+    color: @accent-dark;
+    font-weight: 600;
+}
+
+#img {
+    margin: 0 4px 0 0;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+}
+
+scrollbar {
+    background-color: transparent;
+    width: 0;
+}
+
+scrollbar thumb {
+    background-color: transparent;
+    border: none;
+}
+
+scrollbar track {
+    background-color: transparent;
+}
+
+label {
+    color: @text-primary;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0;
+}
+
+box {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
 }
