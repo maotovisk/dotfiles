@@ -8,16 +8,16 @@ anchor=top-right
 # Background
 background-color=#2D2A2E
 text-color=#F8F8F2
-border-color=#3C3836
-border-size=1
-border-radius=12
-padding=12,16,16
-margin=8
+border-color=#aC38a6
+border-size=2
+border-radius=4
+padding=8,12,12
+margin=4
 
 # Size
-width=350
-height=120
-margin=10
+width=320
+height=100
+margin=6
 
 [urgency=low]
 background-color=#363A4F
