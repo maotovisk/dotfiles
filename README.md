@@ -39,7 +39,7 @@ A comprehensive Arch Linux dotfiles setup featuring Hyprland compositor with a m
 ### Basic Installation
 
 ```bash
-git clone https://github.com/yourusername/maot_dots.git
+git clone https://github.com/maotovisk/dotfiles.git
 cd maot_dots
 chmod +x install_fresh.sh
 ./install_fresh.sh
