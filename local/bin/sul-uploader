@@ -23,18 +23,39 @@ export XDG_CURRENT_DESKTOP=Hyprland
 ###
 # THIS IS FOR HYPRLAND
 ###
-grimblast --freeze --cursor copysave area "$complete_path"
+monitor=$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')
+grim -o "$monitor" "$complete_path"
+satty --filename "$complete_path" \
+      --initial-tool "crop" \
+      --early-exit \
+      --fullscreen \
+      --output-filename "$complete_path" \
+      --actions-on-enter save-to-clipboard \
+      --save-after-copy \
+      --disable-notifications \
+      --copy-command 'wl-copy'
 
 ###
 # UNCOMMENT BELOW FOR KDE PLASMA
 ###
 #spectacle -o /proc/self/fd/1 --region --nonotify >> "$complete_path"
 
+# If user cancels or file is not valid after satty, exit
+if [[ ! -f "$complete_path" ]] || [[ $(file --mime-type -b "$complete_path") != "image/png" ]]; then
+    _notify "Screenshot canceled or not saved"
+    exit 0
+fi
+
+# Ask user if they want to upload
+if ! zenity --question --title="Screenshot Uploader" --text="Upload the screenshot to s-ul.eu?"; then
+    _notify "Upload canceled by user"
+    exit 0
+fi
+
 if [[ $(file --mime-type -b "$complete_path") != "image/png" ]]; then
 	rm "$complete_path"
 	_notify "Screenshot aborted" && exit 1
 fi
-
 
 ###
 #

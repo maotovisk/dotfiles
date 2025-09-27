@@ -1,12 +1,27 @@
-@define-color bg-primary     #1d1a1e;
-@define-color bg-secondary   #272327;
-@define-color bg-tertiary    #1e1c1e;
-@define-color text-primary   #f8f8f2;
-@define-color text-secondary #e2e2dc;
-@define-color border-color   #3a3a3a;
-@define-color accent-blue    #784cc8;
-@define-color accent-dark    #1d1a1e;
+/* --------------------------------------------------
+ * wofi - Compact macOS‑lite Theme
+ * Goals:
+ *  - Very compact vertical footprint
+ *  - White text with subtle shadow for readability
+ *  - Minimal / almost no backgrounds (only lightweight surfaces)
+ *  - Smooth focus / selection accent (macOS blue)
+ *  - GTK CSS compliant (avoid unsupported blur/backdrop filters)
+ * -------------------------------------------------- */
 
+/* Color tokens (kept lean) */
+@define-color surface         rgba(24,24,26,0.78);
+@define-color surface-alt     rgba(255,255,255,0.06);
+@define-color surface-hover   rgba(255,255,255,0.12);
+@define-color surface-active  rgba(10,132,255,0.30);
+@define-color border-color    rgba(255,255,255,0.12);
+@define-color border-strong   rgba(255,255,255,0.25);
+@define-color text            #ffffff;
+@define-color text-dim        rgba(255,255,255,0.65);
+@define-color accent          #0a84ff;
+@define-color accent-hi       #4da8ff;
+@define-color danger          #ff453a;
+
+/* Global reset */
 * {
     margin: 0;
     padding: 0;
@@ -18,117 +33,163 @@
     animation: none;
 }
 
+/* Window container */
 window {
-    font-family: "Adwaita Sans", "SF Mono", "Consolas", monospace;
+    font-family:
+        "SF Pro Text",
+        "SF Pro Display",
+        Inter,
+        -apple-system,
+        system-ui,
+        sans-serif;
     font-size: 12px;
-    font-weight: 500;
-    width: 580px;
-    height: 280px;
-    background-color: @bg-primary;
+    font-weight: 600;
+    background-color: @surface;
+    color: @text;
     border: 1px solid @border-color;
-    color: @text-primary;
+    border-radius: 8px;
+    /* Subtle depth */
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.45),
+        0 1px 2px rgba(0, 0, 0, 0.32);
 }
 
+/* Input field */
 #input {
-    margin: 2px;
-    padding: 3px 6px;
-    background-color: @bg-secondary;
-    color: @text-primary;
+    margin: 4px 6px 2px 6px;
+    padding: 4px 8px;
+    background: @surface-alt;
     border: 1px solid @border-color;
+    color: @text;
     font-size: 12px;
-    font-weight: 500;
-    min-height: 18px;
+    font-weight: 600;
+    min-height: 20px;
+    border-radius: 6px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
 #input:focus {
-    background-color: @bg-tertiary;
-    border-color: @accent-blue;
+    border-color: @accent;
+    background: @surface-hover;
+    color: @text;
 }
 
-#inner-box {
-    padding: 0;
-    margin: 0;
-    background-color: transparent;
-}
-
-#outer-box {
-    padding: 0;
-    margin: 0;
-    background-color: transparent;
-}
-
-#scroll {
-    margin: 0;
-    padding: 0;
-    background-color: transparent;
-}
-
-#text {
-    color: @text-primary;
-    font-size: 12px;
-    font-weight: 500;
+/* Outer / inner layout boxes kept transparent */
+#outer-box,
+#inner-box,
+#scroll,
+box {
+    background: transparent;
     padding: 0;
     margin: 0;
 }
 
-#entry {
-    margin: 0;
-    padding: 3px 6px;
-    background-color: transparent;
-    color: @text-primary;
+/* Entries list scrollbar hidden (still scrolls) */
+scrollbar,
+scrollbar track,
+scrollbar thumb {
+    background: transparent;
     border: none;
+    min-width: 0;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Entry container */
+#entry {
+    background: transparent;
+    color: @text;
+    padding: 2px 8px;
+    margin: 0 4px;
     min-height: 20px;
     max-height: 20px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
+    border-radius: 5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
+/* Icon (if any) */
+#img {
+    margin: 0 6px 0 0;
+    padding: 0;
+    background: transparent;
+}
+
+/* Text label */
+#text {
+    color: @text;
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+
+/* Hover state: light emphasis, no heavy fill */
 #entry:hover {
-    background-color: @bg-secondary;
+    background: @surface-hover;
+    color: @text;
 }
 
+/* Selected entry: macOS-style blue accent */
 #entry:selected {
-    background-color: @accent-blue;
-    color: @accent-dark;
+    background: linear-gradient(145deg, @accent 0%, @accent-hi 100%);
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 }
 
 #entry:selected #text {
-    color: @accent-dark;
-    font-weight: 600;
+    color: #ffffff;
+    font-weight: 700;
 }
 
-#img {
-    margin: 0 4px 0 0;
-    padding: 0;
-    border: none;
-    background-color: transparent;
+/* Dim inactive feel when desired (optional toggle class) */
+.dim #entry {
+    color: @text-dim;
+}
+.dim #entry:selected {
+    color: #ffffff;
 }
 
-scrollbar {
-    background-color: transparent;
-    width: 0;
-}
-
-scrollbar thumb {
-    background-color: transparent;
-    border: none;
-}
-
-scrollbar track {
-    background-color: transparent;
-}
-
+/* Labels (generic) */
 label {
-    color: @text-primary;
+    color: @text;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
     padding: 0;
     margin: 0;
 }
 
-box {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
+/* Optional subtle separator style (disabled by default)
+#entry:not(:last-child) {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
+*/
+
+/* Compact spacing tuning */
+#inner-box {
+    margin: 2px 0 4px 0;
+}
+
+/* Focus outline (keyboard nav) */
+#entry:focus {
+    outline: 1px solid @accent;
+    outline-offset: 1px;
+}
+
+/* Minimal fade for very long lists (optional)
+#scroll {
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.35), transparent 18px),
+    linear-gradient(to top, rgba(0,0,0,0.35), transparent 18px);
+  background-blend-mode: overlay;
+}
+*/
+
+/* End ------------------------------------------------*/

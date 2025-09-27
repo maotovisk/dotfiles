@@ -1,198 +1,273 @@
+/* --------------------------------------------------
+ * Compact macOS‑lite Waybar Theme
+ * Goal: Very compact height, white text with subtle shadow,
+ *       no per-module backgrounds (except workspaces),
+ *       keep shadowed bar background idea.
+ * -------------------------------------------------- */
+
+/* Base ------------------------------------------------*/
 * {
-    font-family: "JetBrainsMonoNL NFP", "Adwaita Sans", monospace;
-    font-size: 11px;
-    font-weight: 400;
+    font-family:
+        Inter,
+        "Arimo Nerd Font",
+        -apple-system,
+        system-ui,
+        sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
     margin: 0;
     padding: 0;
+    border: none;
     min-height: 0;
-    border: none;
+    /* Subtle text shadow to keep readability over any wallpaper */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
 }
 
-/* Color Palette - Flat Design */
-@define-color text           #ffffff;
-@define-color text_secondary #cccccc;
-@define-color text_muted     #999999;
+/* Palette (kept minimal if you want future expansion) */
+@define-color accent    #0a84ff;
+@define-color accent_hi #54a9ff;
+@define-color warn      #ffb300;
+@define-color crit      #ff453a;
+@define-color good      #30d158;
 
-@define-color bg_primary     #1a1a1a;
-@define-color bg_secondary   #2a2a2a;
-@define-color border_color   #333333;
-
-@define-color accent_primary #0078d4;
-@define-color accent_success #107c10;
-@define-color accent_warning #ff8c00;
-@define-color accent_danger  #d13438;
-
-/* Main bar - Flat and thin */
+/* Waybar Window --------------------------------------*/
 window#waybar {
-    background: @bg_primary;
-    border: none;
-    margin: 0;
+    background: transparent;
+    margin: 2px 6px 0 6px;
     padding: 0;
-    color: @text;
-    border-bottom: 1px solid @border_color;
+    /* Shadow “layer” effect only; bar itself remains visually light/transparent */
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.45),
+        0 1px 2px rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
 }
 
-/* Module containers - Minimal spacing */
-.modules-right,
+/* Module Group Containers (no extra backgrounds) -----*/
 .modules-left,
-.modules-center {
+.modules-center,
+.modules-right {
     padding: 0 4px;
 }
 
-/* Workspaces - Flat indicators */
-#workspaces {
-    padding: 0;
-    margin: 0;
-    background: transparent;
-}
-
-#workspaces button {
-    color: @text_muted;
-    padding: 4px 8px;
-    margin: 0 1px;
-    border: none;
-    background: transparent;
-    font-weight: 400;
-    min-width: 20px;
-}
-
-#workspaces button:hover {
-    color: @text;
-    background: transparent;
-}
-
-#workspaces button.active {
-    color: @accent_primary;
-    background: transparent;
-    border-bottom: 1px solid @accent_primary;
-}
-
-#workspaces button.focused {
-    color: @accent_primary;
-    background: transparent;
-}
-
-/* System modules - Flat design */
+/* Universal Module Style (strip backgrounds) ---------*/
+#window,
+#clock,
+#clock.date,
 #cpu,
 #memory,
 #disk,
+#battery,
 #network,
 #pulseaudio,
+#pulseaudio.microphone,
+#keyboard-state,
 #tray,
-#battery {
-    color: @text;
-    padding: 4px 8px;
-    margin: 0;
+#custom-weather,
+#mpris {
     background: transparent;
+    padding: 0 6px;
+    margin: 0 1px;
     border: none;
-    font-weight: 400;
+    font-weight: 600;
 }
 
-#battery {
-    color: @accent_warning;
-}
-
-#battery.charging {
-    color: @accent_success;
-}
-
-#battery.warning:not(.charging) {
-    color: @accent_danger;
-}
-
-/* Clock - Minimal design */
-#clock {
-    padding: 4px 12px;
-    margin: 0;
-    color: @text;
-    font-weight: 500;
-    background: transparent;
-    border: none;
-}
-
-/* Window title - Subtle */
-#window {
-    font-size: 11px;
-    color: @text_secondary;
-    padding: 4px 8px;
-    background: transparent;
-    margin: 0;
-    border: none;
-}
-
-/* No hover effects for speed */
-#weather,
+/* Tighten vertical space */
+#window,
 #clock,
-#tray,
-#pulseaudio,
-#network,
+#clock.date,
 #cpu,
 #memory,
-#battery {
-    transition: none;
+#disk,
+#battery,
+#network,
+#pulseaudio,
+#pulseaudio.microphone,
+#keyboard-state,
+#tray,
+#custom-weather,
+#mpris {
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
-/* Tooltip styling - Minimal */
-tooltip {
-    background: @bg_primary;
-    border: 1px solid @border_color;
-    padding: 4px 8px;
-    margin: 4px;
-    color: @text;
+/* Workspaces (compact pill buttons) ------------------*/
+#workspaces {
+    padding: 0 2px;
+    margin: 0 4px;
+    background: rgba(255, 255, 255, 0.08); /* Only element with a background */
+    border-radius: 10px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+#workspaces button {
+    background: transparent;
+    color: #ffffff;
+    padding: 2px 6px;
+    margin: 2px 2px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 20px;
+    transition: background 0.15s ease;
+}
+
+#workspaces button:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+#workspaces button.active {
+    background: linear-gradient(145deg, @accent 0%, @accent_hi 100%);
+    box-shadow:
+        0 2px 5px rgba(10, 132, 255, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    font-weight: 700;
+}
+
+#workspaces button.focused:not(.active) {
+    background: rgba(10, 132, 255, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+#workspaces button.urgent {
+    background: @crit;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.35),
+        0 2px 5px rgba(255, 69, 58, 0.5);
+    animation: urgent-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes urgent-pulse {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+/* Window Title ---------------------------------------*/
+#window {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    opacity: 0.85;
+}
+
+#window:hover {
+    opacity: 1;
+}
+
+/* Clock ----------------------------------------------*/
+#clock {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+#clock.date {
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+#clock.date:hover {
+    opacity: 1;
+}
+
+/* Stats & States -------------------------------------*/
+#cpu,
+#memory,
+#disk {
+    opacity: 0.85;
+}
+#cpu:hover,
+#memory:hover,
+#disk:hover {
+    opacity: 1;
+}
+
+#cpu.warning,
+#memory.warning,
+#disk.warning {
+    color: @warn;
+}
+#cpu.critical,
+#memory.critical,
+#disk.critical {
+    color: @crit;
+}
+
+#battery.good {
+    color: @good;
+}
+#battery.warning {
+    color: @warn;
+}
+#battery.critical {
+    color: @crit;
+}
+
+#network.disconnected {
+    color: @crit;
+}
+
+#pulseaudio.muted {
+    color: @crit;
+}
+
+/* Keyboard State -------------------------------------*/
+#keyboard-state {
     font-size: 10px;
-    font-weight: 400;
+    opacity: 0.7;
+}
+#keyboard-state:hover {
+    opacity: 1;
+}
+
+/* Tray ------------------------------------------------*/
+#tray > .passive {
+    opacity: 0.55;
+}
+#tray > .needs-attention {
+    color: @crit;
+    font-weight: 700;
+}
+
+/* Focus (Keyboard Nav) -------------------------------*/
+button:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 2px;
+}
+
+/* Tooltips -------------------------------------------*/
+tooltip {
+    background: rgba(22, 22, 24, 0.92);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
 }
 
 tooltip label {
-    color: @text;
-    padding: 4px 8px;
-    font-family: "JetBrainsMonoNL NFP", "Adwaita Sans", monospace;
-}
-
-/* Custom module spacing for maximum efficiency */
-#custom-separator {
-    color: @border_color;
-    padding: 0 2px;
-    margin: 0;
-    font-size: 10px;
-}
-
-/* Network module specific styling */
-#network.disconnected {
-    color: @accent_danger;
-}
-
-#network.wifi {
-    color: @accent_primary;
-}
-
-#network.ethernet {
-    color: @accent_success;
-}
-
-/* Audio module states */
-#pulseaudio.muted {
-    color: @accent_danger;
-}
-
-/* CPU and Memory usage colors */
-#cpu.warning {
-    color: @accent_warning;
-}
-
-#cpu.critical {
-    color: @accent_danger;
-}
-
-#memory.warning {
-    color: @accent_warning;
-}
-
-#memory.critical {
-    color: @accent_danger;
-}
-
-/* Height constraint through padding control */
-window#waybar {
     padding: 0;
+    color: #ffffff;
+}
+
+/* Optional: remove unwanted spacing between groups */
+.modules-left > *:first-child,
+.modules-center > *:first-child,
+.modules-right > *:first-child {
+    margin-left: 0;
+}
+.modules-left > *:last-child,
+.modules-center > *:last-child,
+.modules-right > *:last-child {
+    margin-right: 0;
 }
