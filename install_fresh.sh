@@ -173,3 +173,5 @@ install_deps() {
         print_warn "Skipping config files installation."
     fi
 }
+
+install_deps
