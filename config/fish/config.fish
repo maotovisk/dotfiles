@@ -25,7 +25,8 @@ set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
 
 # miniconda
-source ~/miniconda3/etc/fish/conf.d/conda.fish
+
+#source ~/miniconda3/etc/fish/conf.d/conda.fish
 # =============================================================================
 #
 # Utility functions for zoxide.

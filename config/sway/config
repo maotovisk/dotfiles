@@ -1,0 +1,183 @@
+# Sway configuration derived from the Hyprland setup in this repo
+
+##############################################################
+# Variables / default applications
+##############################################################
+set $mod Mod4
+set $terminal kitty
+set $fileManager dolphin
+set $menu wofi --show drun
+set $browser firefox
+set $waybar_launcher $HOME/.config/sway/launch_waybar.sh
+
+# Env vars now live in ~/.config/environment.d/50-sway.conf
+
+##############################################################
+# Display layout (monitors + wallpaper)
+##############################################################
+output DP-1 {
+    mode 1920x1080@180Hz
+    pos 0 0
+    scale 1
+    allow_tearing yes
+}
+
+output DP-2 {
+    mode 1920x1080@144Hz
+    pos 1920 0
+    scale 1
+    allow_tearing yes
+}
+
+# Keep workspace layout consistent with Hyprland (DP-1 primary)
+workspace 1 output DP-1
+workspace 2 output DP-2
+
+# Wallpaper equivalent to hyprpaper setup
+exec_always hyprpaper
+
+##############################################################
+# Autostart (mirrors Hyprland exec-once)
+##############################################################
+exec_always --no-startup-id nm-applet
+exec_always --no-startup-id mako
+exec --no-startup-id systemctl --user start hyprpolkitagent
+exec --no-startup-id gnome-keyring-daemon --start --components=secrets
+exec --no-startup-id swayidle -w timeout 500 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
+
+##############################################################
+# General look & behavior
+##############################################################
+floating_modifier $mod normal
+focus_follows_mouse yes
+mouse_warping container
+gaps inner 4
+gaps outer 8
+smart_gaps off
+smart_borders off
+default_border pixel 1
+default_floating_border pixel 1
+client.focused          #5259aa #5259aa #ffffff #5259aa #5259aa
+client.focused_inactive #585858 #585858 #dddddd #303030 #585858
+client.unfocused        #585858 #585858 #dddddd #303030 #585858
+client.urgent           #f38ba8 #f38ba8 #ffffff #f38ba8 #f38ba8
+focus_wrapping no
+focus_on_window_activation urgent
+
+##############################################################
+# Input (from Hyprland input block)
+##############################################################
+input "type:keyboard" {
+    xkb_layout "us,br"
+    xkb_variant "intl,abnt2"
+    xkb_options "grp:rctrl_toggle"
+}
+
+input "type:pointer" {
+    accel_profile flat
+    pointer_accel -0.5
+}
+
+input "type:touchpad" {
+    tap enabled
+    natural_scroll disabled
+}
+
+##############################################################
+# Key bindings
+##############################################################
+# Essential apps
+bindsym $mod+Return exec $terminal
+bindsym $mod+Shift+q kill
+bindsym $mod+m exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit Sway? This will end your Wayland session.' -b 'Yes, exit Sway' 'swaymsg exit'
+bindsym $mod+e exec $fileManager
+bindsym $mod+b exec $browser
+bindsym $mod+v floating toggle
+bindsym $mod+r exec $menu
+bindsym $mod+f fullscreen toggle
+bindsym $mod+p layout toggle split
+bindsym $mod+j split toggle
+bindsym $mod+Shift+c exec /home/maoto/.local/bin/toggle-warp
+bindsym $mod+Shift+z exec sh -c 'pkill -x waybar; $waybar_launcher'
+bindsym $mod+Shift+s exec /home/maoto/.local/bin/sul-uploader
+bindsym $mod+Shift+g exec /home/maoto/.local/bin/osu-gamma
+
+# Focus movement (arrow keys)
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Workspace switching (numbers)
+set $ws1 1
+set $ws2 2
+set $ws3 3
+set $ws4 4
+set $ws5 5
+set $ws6 6
+set $ws7 7
+set $ws8 8
+set $ws9 9
+set $ws10 10
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# Workspace scrolling using mouse wheel while holding Mod
+bindsym $mod+button4 workspace prev
+bindsym $mod+button5 workspace next
+
+# Move/resize using mouse buttons
+bindsym --whole-window $mod+Button1 move
+bindsym --whole-window $mod+Button3 resize
+
+# Alt+Tab behavior → cycle through windows
+bindsym Mod1+Tab focus next
+bindsym Mod1+Shift+Tab focus prev
+
+# Media / misc keys
+set $discord_mute $HOME/.config/sway/scripts/discord-toggle-mute.sh
+bindsym XF86AudioPlay exec $discord_mute
+bindsym XF86AudioPause exec $discord_mute
+
+##############################################################
+# Window rules (rough equivalents of Hyprland windowrules)
+##############################################################
+for_window [title=".*Picture-in-Picture.*"] floating enable
+for_window [class="org.freedesktop.impl.portal.desktop.kde"] floating enable
+for_window [app_id="org.freedesktop.impl.portal.desktop.kde"] floating enable
+for_window [class="xdg-desktop-portal-gtk"] floating enable
+for_window [app_id="xdg-desktop-portal-gtk"] floating enable
+for_window [app_id="wofi"] floating enable, border none
+for_window [title="gsr ui"] floating enable
+for_window [class="jetbrains-toolbox"] floating enable, no_focus
+for_window [class="jetbrains-.*" title="^win.*"] no_focus
+for_window [class="jetbrains-.*" title="^$"] floating enable, resize set width 672 px height 700 px
+for_window [title="satty"] floating enable
+
+for_window [title=".*"] allow_tearing yes
+##############################################################
+# Bar (Waybar launcher)
+##############################################################
+bar {
+    swaybar_command $waybar_launcher
+}
