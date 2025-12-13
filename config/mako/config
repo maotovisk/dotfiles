@@ -1,7 +1,7 @@
 font=Fira Sans 12
 format=<b>%a</b>\n<span color='#6a6a6a'>%s</span>\n<span color='#6a6a6a'>%b</span>
 sort=-time
-output=DP-1
+output=DP-2
 layer=overlay
 anchor=top-right
 

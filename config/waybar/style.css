@@ -62,6 +62,7 @@ window#waybar {
 #pulseaudio,
 #pulseaudio.microphone,
 #keyboard-state,
+#custom-notifications,
 #tray,
 #custom-weather,
 #mpris {
@@ -84,6 +85,7 @@ window#waybar {
 #pulseaudio,
 #pulseaudio.microphone,
 #keyboard-state,
+#custom-notifications,
 #tray,
 #custom-weather,
 #mpris {
@@ -235,6 +237,40 @@ window#waybar {
 #tray > .needs-attention {
     color: @crit;
     font-weight: 700;
+}
+
+#custom-notifications {
+    background: rgba(255, 255, 255, 0.06);
+    padding: 3px 6px;
+    margin: 3px 6px 3px 2px;
+    border-radius: 12px;
+    min-width: 28px;
+    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+#custom-notifications:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+#custom-notifications.unread {
+    background: linear-gradient(145deg, @accent 0%, @accent_hi 100%);
+    color: #0c111a;
+    text-shadow: none;
+    box-shadow:
+        0 4px 14px rgba(10, 132, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+#custom-notifications.dnd,
+#custom-notifications.muted {
+    color: @warn;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#custom-notifications.urgent {
+    color: @crit;
+    background: rgba(255, 69, 58, 0.18);
+    box-shadow: 0 6px 14px rgba(255, 69, 58, 0.28);
 }
 
 /* Focus (Keyboard Nav) -------------------------------*/

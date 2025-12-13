@@ -9,7 +9,7 @@
   "spacing": 8, // More spacious macOS-like layout
   "fixed-center": true,
   "gtk-layer-shell": true,
-  "output": ["DP-1"],
+  "output": ["DP-2"],
   "mode": "dock",
   "exclusive": false,
 
@@ -17,6 +17,7 @@
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock", "clock#date", "mpris", "custom/weather"],
   "modules-right": [
+    "custom/notifications",
     "tray",
     "cpu",
     "memory",
@@ -158,6 +159,18 @@
     "on-click-right": "kitty --class=netmon nmtui",
     "interval": 2,
     "max-length": 25,
+  },
+
+  // Notifications - swaync status
+  "custom/notifications": {
+    "return-type": "json",
+    "interval": 0,
+    "exec": "swaync-client -swb -sw",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "on-click-middle": "swaync-client -C -sw",
+    "format": "\uf0f3 {}",
+    "tooltip": true
   },
 
   // Clock - elegant time display

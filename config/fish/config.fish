@@ -132,3 +132,6 @@ alias zi=__zoxide_zi
 set -gx PATH $PATH /home/maoto/.lmstudio/bin
 # End of LM Studio CLI section
 
+
+# opencode
+fish_add_path /home/maoto/.opencode/bin

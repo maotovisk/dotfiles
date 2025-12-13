@@ -15,14 +15,14 @@ set $waybar_launcher $HOME/.config/sway/launch_waybar.sh
 ##############################################################
 # Display layout (monitors + wallpaper)
 ##############################################################
-output DP-1 {
+output DP-2 {
     mode 1920x1080@180Hz
     pos 0 0
     scale 1
     allow_tearing yes
 }
 
-output DP-2 {
+output DP-1 {
     mode 1920x1080@144Hz
     pos 1920 0
     scale 1
@@ -30,8 +30,8 @@ output DP-2 {
 }
 
 # Keep workspace layout consistent with Hyprland (DP-1 primary)
-workspace 1 output DP-1
-workspace 2 output DP-2
+workspace 1 output DP-2
+workspace 2 output DP-1
 
 # Wallpaper equivalent to hyprpaper setup
 exec_always hyprpaper
