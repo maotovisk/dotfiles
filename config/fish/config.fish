@@ -135,3 +135,5 @@ set -gx PATH $PATH /home/maoto/.lmstudio/bin
 
 # opencode
 fish_add_path /home/maoto/.opencode/bin
+
+fish_add_path /home/maoto/.spicetify
