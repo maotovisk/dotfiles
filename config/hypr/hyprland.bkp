@@ -28,8 +28,7 @@ exec-once = xrandr --output DP-2 --primary
 $terminal    = kitty
 $fileManager = dolphin
 $menu        = hyprlauncher
-$browser     = firefox
-
+$browser     = zen-browser
 
 #################
 ### AUTOSTART ###
@@ -89,34 +88,34 @@ decoration {
   active_opacity = 0.92
   inactive_opacity = 0.86
   fullscreen_opacity = 1.0
-  
+
   blur {
     enabled = true
-    
+
     # Aumentar passes e diminuir size cria o efeito "leitoso/fosco"
     size = 8
     passes = 2
-    
+
     # Otimizações de performance
     new_optimizations = true
-    
+
     # Faz o blur funcionar mesmo se a janela tiver opacidade definida por regra
     ignore_opacity = true
-    
+
     # --- Ajustes de Cor e Textura ---
     # Adiciona um pouco de ruído para prevenir "color banding" (faixas de cor) em monitores
     noise = 0.02
-    
+
     # Aumenta o contraste para destacar o texto atrás do blur
     contrast = 0.95
-    
+
     # Reduz levemente o brilho para dar profundidade
     brightness = 0.9
-    
+
     # Aumenta a saturação das cores atrás do vidro (efeito moderno)
     vibrancy = 0.2
     vibrancy_darkness = 0.0
-    
+
     # --- Popups ---
     popups = true
     popups_ignorealpha = 0.6 # Reduzi para pegar popups levemente transparentes também
@@ -199,14 +198,14 @@ input {
 
   follow_mouse = 1
   accel_profile = flat
-  sensitivity = -0.5
+  sensitivity = 0
 
   touchpad {
     natural_scroll = false
   }
 }
 device {
-  name = opentabletdriver-virtual-artist-tablet 
+  name = opentabletdriver-virtual-artist-tablet
   output = DP-2
 }
 ###################
@@ -310,7 +309,7 @@ windowrule {
     name = jetbrains-toolbox
     match:class = jetbrains-toolbox
     match:float = 1
-    
+
     no_initial_focus = on
 }
 
@@ -318,7 +317,7 @@ windowrule {
     name = jetbrains-popups
     match:class = (jetbrains-)(.*)
     match:title = ^win(.*)
-    
+
     no_initial_focus = on
 }
 
@@ -327,7 +326,7 @@ windowrule {
     match:class = (jetbrains-)(.*)
     match:title = ^$
     match:float = 1
-    
+
     size = 672 700
 }
 
@@ -335,7 +334,7 @@ windowrule {
 windowrule {
     name = picture-in-picture
     match:title = (.*)(Picture-in-Picture)
-    
+
     float = on
 }
 
@@ -350,7 +349,7 @@ windowrule {
 windowrule {
     name = satty-rules
     match:class = (com.gabm.satty)(.*)
-    
+
     # Desativa tearing no Satty (para evitar glitches ao editar print)
     immediate = false
     # Remove animação
@@ -362,7 +361,7 @@ windowrule {
     match:class = (osu!.exe)
     match:float = 1
     match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
-    
+
     stay_focused = on
 }
 
@@ -381,7 +380,7 @@ windowrule {
     match:class = (osu_stable)
     match:float = 1
     match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
-    
+
     stay_focused = on
 }
 
@@ -411,7 +410,7 @@ windowrule {
     match:class = (osu-unstable-exe)
     match:float = 1
     match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
-    
+
     stay_focused = on
 }
 
@@ -421,7 +420,7 @@ windowrule {
 windowrule {
     name = gsr-ui
     match:title = (gsr ui)
-    
+
     no_blur = false
     stay_focused = on
 }
@@ -430,14 +429,14 @@ windowrule {
 windowrule {
     name = kde-portal
     match:class = (org.freedesktop.impl.portal.desktop.kde)
-    
+
     float = on
 }
 
 windowrule {
     name = gtk-portal
     match:class = (xdg-desktop-portal-gtk)
-    
+
     float = on
 }
 
@@ -449,7 +448,7 @@ windowrule {
 layerrule {
     name = wofi-style
     match:namespace = wofi
-    
+
     animation = slidevert
     blur = on
 }
