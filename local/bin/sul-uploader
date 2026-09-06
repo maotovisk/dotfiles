@@ -1,66 +1,262 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# sul-uploader — take a screenshot and upload it to s-ul.eu
+#
+# The screenshot backend is read from ~/.config/sul-uploader/config.ini
+# (backend=<id>). If unset or unavailable, the first installed backend
+# from the list below is used automatically.
+#
+# Supported backends (--list-backends):
+#   hyprland-satty   Hyprland focused monitor (grim) + satty annotation
+#   grim-slurp       Wayland region select (grim + slurp, satty if present)
+#   spectacle        KDE Spectacle region capture
+#   flameshot        Flameshot GUI (annotate, saves on accept)
+#   gnome            GNOME Screenshot area capture
+#
+# Usage:
+#   sul-uploader [--backend <id>] [--list-backends] [--help]
+#
+# Config (~/.config/sul-uploader/config.ini):
+#   [DEFAULT]
+#   key=YOUR_S_UL_API_KEY
+#   backend=hyprland-satty
+#
+# Dependencies (common): curl, jq, file, notify-send, zenity (or kdialog),
+#   wl-copy (or xclip) — plus whichever backend tools you use.
 
-app_name="Screenshot Uploader"
+set -u
 
-# Dependencies: curl, notify-send, xclip, wl-clipboard, jq
-function _notify() {
-	notify-send --expire-time 1000 \
-		--app-name "$app_name" \
-		--icon 'screengrab' \
-		"$1" "$2"
+APP_NAME="Screenshot Uploader"
+CONFIG_FILE="$HOME/.config/sul-uploader/config.ini"
+STORE_DIR="$HOME/s-ul"
+
+BACKENDS="hyprland-satty grim-slurp spectacle flameshot gnome"
+
+usage() {
+    sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'
 }
 
-store_directory=/home/$USER/s-ul
-if [[ ! -e $store_directory ]]; then
-	mkdir $store_directory
-fi
+command_exists() { command -v "$1" >/dev/null 2>&1; }
 
-current_date=$(date +"%Y-%m-%d %H-%M-%S")
+backend_label() {
+    case "$1" in
+        hyprland-satty) echo "Hyprland (grim + satty)" ;;
+        grim-slurp)     echo "Wayland region (grim + slurp)" ;;
+        spectacle)      echo "KDE Spectacle" ;;
+        flameshot)      echo "Flameshot" ;;
+        gnome)          echo "GNOME Screenshot" ;;
+        *)              echo "$1" ;;
+    esac
+}
+
+# Required commands per backend (satty is optional for grim-slurp:
+# used for annotation when present, skipped otherwise).
+backend_commands() {
+    case "$1" in
+        hyprland-satty) echo "hyprctl grim satty" ;;
+        grim-slurp)     echo "grim slurp" ;;
+        spectacle)      echo "spectacle" ;;
+        flameshot)      echo "flameshot" ;;
+        gnome)          echo "gnome-screenshot" ;;
+        *)              echo "" ;;
+    esac
+}
+
+backend_valid() {
+    case " $BACKENDS " in
+        *" $1 "*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+backend_available() {
+    local cmd
+    for cmd in $(backend_commands "$1"); do
+        command_exists "$cmd" || return 1
+    done
+    return 0
+}
+
+list_backends() {
+    local id marker=""
+    for id in $BACKENDS; do
+        if backend_available "$id"; then
+            marker=" [installed]"
+        else
+            marker=" [missing: $(backend_commands "$id")]"
+        fi
+        printf '%-15s %s%s\n' "$id" "$(backend_label "$id")" "$marker"
+    done
+}
+
+config_value() {
+    # $1 = key name; prints value with surrounding whitespace stripped.
+    [ -f "$CONFIG_FILE" ] || return 0
+    awk -F= -v k="$1" '
+        /^[[:space:]]*#/ { next }
+        /^[[:space:]]*\[/ { next }
+        {
+            key = $1
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+            if (key == k) {
+                $1 = ""
+                val = substr($0, 2)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", val)
+                print val
+                exit
+            }
+        }
+    ' "$CONFIG_FILE"
+}
+
+resolve_backend() {
+    local requested="$1" id
+    if [ -n "$requested" ]; then
+        if ! backend_valid "$requested"; then
+            echo "Error: unknown backend '$requested'. Valid: $BACKENDS" >&2
+            return 1
+        fi
+        if ! backend_available "$requested"; then
+            echo "Error: backend '$requested' needs missing tools: $(backend_commands "$requested")" >&2
+            return 1
+        fi
+        printf '%s' "$requested"
+        return 0
+    fi
+    requested="$(config_value backend)"
+    if [ -n "$requested" ] && backend_valid "$requested" && backend_available "$requested"; then
+        printf '%s' "$requested"
+        return 0
+    fi
+    for id in $BACKENDS; do
+        if backend_available "$id"; then
+            printf '%s' "$id"
+            return 0
+        fi
+    done
+    echo "Error: no screenshot backend installed. Need one of:" >&2
+    list_backends >&2
+    return 1
+}
+
+_notify() {
+    command_exists notify-send || return 0
+    notify-send --expire-time 1000 \
+        --app-name "$APP_NAME" \
+        --icon 'screengrab' \
+        "$1" "${2:-}"
+}
+
+_confirm() {
+    # $1 = question text. True when user accepts upload.
+    if command_exists zenity; then
+        zenity --question --title="$APP_NAME" --text="$1"
+    elif command_exists kdialog; then
+        kdialog --yesno "$1" --title "$APP_NAME"
+    else
+        # No dialog tool: assume yes (headless/scripted use).
+        return 0
+    fi
+}
+
+_copy_url() {
+    if command_exists wl-copy; then
+        wl-copy "$1"
+    elif command_exists xclip; then
+        printf '%s' "$1" | xclip -selection clipboard
+    else
+        _notify "No clipboard tool (wl-copy/xclip)" "$1"
+    fi
+}
+
+capture_hyprland_satty() {
+    local file="$1" monitor=""
+    monitor="$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')"
+    grim -o "$monitor" "$file" || return 1
+    satty --filename "$file" \
+        --initial-tool "crop" \
+        --early-exit \
+        --fullscreen \
+        --output-filename "$file" \
+        --actions-on-enter save-to-clipboard \
+        --save-after-copy \
+        --disable-notifications \
+        --copy-command 'wl-copy'
+}
+
+capture_grim_slurp() {
+    local file="$1" region=""
+    region="$(slurp)" || return 1
+    [ -n "$region" ] || return 1
+    grim -g "$region" "$file" || return 1
+    if command_exists satty; then
+        satty --filename "$file" \
+            --initial-tool "crop" \
+            --early-exit \
+            --fullscreen \
+            --output-filename "$file" \
+            --actions-on-enter save-to-clipboard \
+            --save-after-copy \
+            --disable-notifications \
+            --copy-command 'wl-copy'
+    fi
+}
+
+capture_spectacle() {
+    spectacle --background --nonotify --region --output "$1"
+}
+
+capture_flameshot() {
+    flameshot gui --path "$1"
+}
+
+capture_gnome() {
+    gnome-screenshot --area --file="$1"
+}
+
+BACKEND_OVERRIDE=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --backend)
+            [ $# -ge 2 ] || { echo "Error: --backend needs an id. Valid: $BACKENDS" >&2; exit 1; }
+            BACKEND_OVERRIDE="$2"; shift 2 ;;
+        --backend=*) BACKEND_OVERRIDE="${1#--backend=}"; shift ;;
+        --list-backends) list_backends; exit 0 ;;
+        -h|--help) usage; exit 0 ;;
+        *) echo "Error: unknown option: $1 (see --help)" >&2; exit 1 ;;
+    esac
+done
+
+BACKEND="$(resolve_backend "$BACKEND_OVERRIDE")" || exit 1
+
+mkdir -p "$STORE_DIR"
+
+current_date="$(date +"%Y-%m-%d %H-%M-%S")"
 filename="Screenshot_$current_date.png"
-complete_path="${store_directory}/${filename}"
+complete_path="${STORE_DIR}/${filename}"
 
-export XDG_CURRENT_DESKTOP=Hyprland
-###
-# THIS IS FOR HYPRLAND
-###
-monitor=$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')
-grim -o "$monitor" "$complete_path"
-satty --filename "$complete_path" \
-      --initial-tool "crop" \
-      --early-exit \
-      --fullscreen \
-      --output-filename "$complete_path" \
-      --actions-on-enter save-to-clipboard \
-      --save-after-copy \
-      --disable-notifications \
-      --copy-command 'wl-copy'
+case "$BACKEND" in
+    hyprland-satty) capture_hyprland_satty "$complete_path" || true ;;
+    grim-slurp)     capture_grim_slurp "$complete_path" || true ;;
+    spectacle)      capture_spectacle "$complete_path" || true ;;
+    flameshot)      capture_flameshot "$complete_path" || true ;;
+    gnome)          capture_gnome "$complete_path" || true ;;
+esac
 
-###
-# UNCOMMENT BELOW FOR KDE PLASMA
-###
-#spectacle -o /proc/self/fd/1 --region --nonotify >> "$complete_path"
-
-# If user cancels or file is not valid after satty, exit
-if [[ ! -f "$complete_path" ]] || [[ $(file --mime-type -b "$complete_path") != "image/png" ]]; then
+# If user cancels or file is not valid after capture, exit quietly.
+if [ ! -f "$complete_path" ] || [ "$(file --mime-type -b "$complete_path")" != "image/png" ]; then
     _notify "Screenshot canceled or not saved"
     exit 0
 fi
 
 # Ask user if they want to upload
-if ! zenity --question --title="Screenshot Uploader" --text="Upload the screenshot to s-ul.eu?"; then
+if ! _confirm "Upload the screenshot to s-ul.eu?"; then
     _notify "Upload canceled by user"
     exit 0
 fi
 
-if [[ $(file --mime-type -b "$complete_path") != "image/png" ]]; then
-	rm "$complete_path"
-	_notify "Screenshot aborted" && exit 1
-fi
-
-###
-#
-###
-key="$(awk -F= '/^key/ {print $2}' ~/.config/sul-uploader/config.ini)"
+key="$(config_value key)"
 if [ -z "$key" ]; then
     _notify "Error: API key not found in config.ini"
     exit 1
@@ -74,24 +270,20 @@ file="$complete_path"
 actualsize=$(wc -c <"$file")
 maxsize=209714177
 
-if [ $actualsize -ge $maxsize ]; then
-	_notify "\nSorry, your file is too large to be uploaded. Please try a smaller file.\n"
+if [ "$actualsize" -ge "$maxsize" ]; then
+    _notify "\nSorry, your file is too large to be uploaded. Please try a smaller file.\n"
 fi
 
 _notify 'Uploading screenshot...'
 
 response=$(curl -s -X "$method" "$postURL?key=$key&wizard=$wizard" -F "file=@$file")
-url=$(echo "$response" | jq -r '.url')
+url=$(printf '%s' "$response" | jq -r '.url')
 
 if [ -z "$url" ] || [ "$url" = "null" ]; then
-	error_msg=$(echo "$response" | jq -r '.error // "Unknown error"')
-	echo $response
-	_notify "Error: Upload failed" "$error_msg"
+    error_msg=$(printf '%s' "$response" | jq -r '.error // "Unknown error"')
+    printf '%s\n' "$response"
+    _notify "Error: Upload failed" "$error_msg"
 else
-	if [ "$XDG_SESSION_TYPE" = "x11" ]; then
-		echo -n "$url" | xclip -selection clipboard
-	else
-		wl-copy "$url"
-	fi
-	_notify 'Success! Screenshot uploaded to:' "$url"
+    _copy_url "$url"
+    _notify 'Success! Screenshot uploaded to:' "$url"
 fi

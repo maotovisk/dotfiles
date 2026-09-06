@@ -1,8 +1,6 @@
 /* --------------------------------------------------
- * Compact macOS‑lite Waybar Theme
- * Goal: Very compact height, white text with subtle shadow,
- *       no per-module backgrounds (except workspaces),
- *       keep shadowed bar background idea.
+ * Compact flat Waybar theme
+ * Neutral charcoal surfaces, warm highlights and restrained contrast.
  * -------------------------------------------------- */
 
 /* Base ------------------------------------------------*/
@@ -15,31 +13,32 @@
         sans-serif;
     font-size: 12px;
     font-weight: 600;
-    color: #ffffff;
+    color: #f2f0eb;
     margin: 0;
     padding: 0;
     border: none;
     min-height: 0;
-    /* Subtle text shadow to keep readability over any wallpaper */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+    text-shadow: none;
 }
 
-/* Palette (kept minimal if you want future expansion) */
-@define-color accent    #0a84ff;
-@define-color accent_hi #54a9ff;
-@define-color warn      #ffb300;
-@define-color crit      #ff453a;
-@define-color good      #30d158;
+/* Neutral/warm palette inspired by the launcher reference. */
+@define-color text      #f2f0eb;
+@define-color muted     #b9b5ad;
+@define-color accent    #c39a4a;
+@define-color accent_hi #e0be73;
+@define-color warn      #e0ad55;
+@define-color crit      #ef7068;
+@define-color good      #83bd8b;
 
 /* Waybar Window --------------------------------------*/
 window#waybar {
-    background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0) 100%
-    );
-    margin: 0 6px 0 6px; /* top margin removida */
-    padding: 4px 0 0 0;  /* 4px no topo */
+    background: rgba(20, 20, 22, 0.92);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+window#waybar > box {
+    padding: 2px 8px;
 }
 
 
@@ -47,7 +46,7 @@ window#waybar {
 .modules-left,
 .modules-center,
 .modules-right {
-    padding: 0 4px;
+    padding: 0 2px;
 }
 
 /* Universal Module Style (strip backgrounds) ---------*/
@@ -93,52 +92,90 @@ window#waybar {
     padding-bottom: 2px;
 }
 
-/* Workspaces (compact pill buttons) ------------------*/
+/* Workspaces (compact numbered dots) -----------------*/
 #workspaces {
     padding: 0 2px;
-    margin: 2px 4px;
-    background: rgba(255, 255, 255, 0.08); /* Only element with a background */
-    border-radius: 10px;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-        0 1px 3px rgba(0, 0, 0, 0.35);
+    margin: 0 2px 0 0;
+    background: transparent;
 }
 
 #workspaces button {
     background: transparent;
-    color: #ffffff;
-    padding: 2px 6px;
-    margin: 2px 2px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    min-width: 20px;
-    transition: background 0.15s ease;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    padding: 7px 2px;
+    margin: 0;
+    border-radius: 0;
+    min-width: 16px;
+    min-height: 0;
+    opacity: 0.52;
+}
+
+#workspaces button label {
+    background: @muted;
+    border-radius: 999px;
+    padding: 0 4px;
+    min-width: 8px;
+    min-height: 14px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #141416;
+    transition:
+        min-width 180ms ease,
+        background-color 180ms ease,
+        opacity 180ms ease;
 }
 
 #workspaces button:hover {
-    background: rgba(255, 255, 255, 0.18);
+    background: transparent;
+    opacity: 0.82;
 }
 
-#workspaces button.active {
-    background: linear-gradient(145deg, @accent 0%, @accent_hi 100%);
-    box-shadow:
-        0 2px 5px rgba(10, 132, 255, 0.45),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    font-weight: 700;
+#workspaces button:hover label {
+    background: @text;
 }
 
-#workspaces button.focused:not(.active) {
-    background: rgba(10, 132, 255, 0.35);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+#workspaces button.active label {
+    background: @accent_hi;
+    min-width: 20px;
+}
+
+/* Visible on another monitor, but not globally focused. */
+#workspaces button.visible:not(.active) {
+    opacity: 0.9;
+}
+
+#workspaces button.visible:not(.active) label {
+    background: @accent;
+}
+
+#workspaces button.urgent label {
+    background: @crit;
+}
+
+#workspaces button.active,
+#workspaces button.urgent {
+    opacity: 1;
 }
 
 #workspaces button.urgent {
-    background: @crit;
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.35),
-        0 2px 5px rgba(255, 69, 58, 0.5);
     animation: urgent-pulse 1.4s ease-in-out infinite;
+}
+
+#workspaces button.empty:not(.active) {
+    opacity: 0.24;
+}
+
+#workspaces button:hover,
+#workspaces button:active,
+#workspaces button:checked,
+#workspaces button:focus {
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
 }
 
 @keyframes urgent-pulse {
@@ -157,7 +194,7 @@ window#waybar {
 #window {
     font-size: 11px;
     font-weight: 600;
-    color: #ffffff;
+    color: @text;
     opacity: 0.85;
 }
 
@@ -240,37 +277,43 @@ window#waybar {
 }
 
 #custom-notifications {
-    background: rgba(255, 255, 255, 0.06);
+    background: transparent;
     padding: 3px 6px;
     margin: 3px 6px 3px 2px;
-    border-radius: 12px;
+    border-radius: 6px;
     min-width: 28px;
-    transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    box-shadow: none;
+    transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
 }
 
 #custom-notifications:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 248, 232, 0.12);
 }
 
-#custom-notifications.unread {
-    background: linear-gradient(145deg, @accent 0%, @accent_hi 100%);
-    color: #0c111a;
-    text-shadow: none;
-    box-shadow:
-        0 4px 14px rgba(10, 132, 255, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+#custom-notifications.notification,
+#custom-notifications.inhibited-notification {
+    background: rgba(224, 190, 115, 0.18);
+    color: @text;
+    box-shadow: none;
 }
 
-#custom-notifications.dnd,
-#custom-notifications.muted {
+#custom-notifications.dnd-none,
+#custom-notifications.dnd-notification,
+#custom-notifications.dnd-inhibited-none,
+#custom-notifications.dnd-inhibited-notification {
     color: @warn;
     background: rgba(255, 255, 255, 0.05);
 }
 
-#custom-notifications.urgent {
-    color: @crit;
-    background: rgba(255, 69, 58, 0.18);
-    box-shadow: 0 6px 14px rgba(255, 69, 58, 0.28);
+#custom-notifications.inhibited-none,
+#custom-notifications.inhibited-notification {
+    opacity: 0.72;
+}
+
+#custom-notifications.cc-open {
+    border-color: rgba(224, 190, 115, 0.42);
+    background: rgba(224, 190, 115, 0.12);
+    box-shadow: none;
 }
 
 /* Focus (Keyboard Nav) -------------------------------*/
@@ -281,9 +324,9 @@ button:focus {
 
 /* Tooltips -------------------------------------------*/
 tooltip {
-    background: rgba(22, 22, 24, 0.92);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(18, 18, 20, 0.94);
+    color: @text;
+    border: 1px solid rgba(255, 248, 232, 0.13);
     padding: 6px 8px;
     border-radius: 6px;
     font-size: 11px;
@@ -293,7 +336,7 @@ tooltip {
 
 tooltip label {
     padding: 0;
-    color: #ffffff;
+    color: @text;
 }
 
 /* Optional: remove unwanted spacing between groups */

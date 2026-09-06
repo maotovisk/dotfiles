@@ -17,6 +17,7 @@
   "modules-left": ["sway/workspaces", "sway/window"],
   "modules-center": ["clock", "clock#date", "mpris", "custom/weather"],
   "modules-right": [
+    "custom/notifications",
     "keyboard-state",
     "tray",
     "cpu",
@@ -158,6 +159,18 @@
     "max-length": 25,
   },
 
+  // Notifications - live swaync status
+  "custom/notifications": {
+    "return-type": "json",
+    "exec-if": "command -v swaync-client",
+    "exec": "swaync-client -swb",
+    "on-click": "swaync-client -t -sw",
+    "on-click-right": "swaync-client -d -sw",
+    "on-click-middle": "swaync-client -C -sw",
+    "format": "\uf0f3 {}",
+    "tooltip": true,
+  },
+
   // Clock
   "clock": {
     "interval": 1,
@@ -180,11 +193,11 @@
       "on-scroll": 1,
       "on-click-right": "mode",
       "format": {
-        "months": "<span color='#74c7ec'><b>{}</b></span>",
-        "days": "<span color='#cdd6f4'><b>{}</b></span>",
-        "weeks": "<span color='#89b4fa'><b>W{}</b></span>",
-        "weekdays": "<span color='#a6e3a1'><b>{}</b></span>",
-        "today": "<span color='#f9e2af'><b><u>{}</u></b></span>",
+        "months": "<span color='#e0be73'><b>{}</b></span>",
+        "days": "<span color='#d7d2c8'><b>{}</b></span>",
+        "weeks": "<span color='#b9b5ad'><b>W{}</b></span>",
+        "weekdays": "<span color='#aabda9'><b>{}</b></span>",
+        "today": "<span color='#f1d69a'><b><u>{}</u></b></span>",
       },
     },
     "actions": {

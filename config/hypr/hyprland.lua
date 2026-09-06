@@ -6,7 +6,7 @@ local path = os.getenv("PATH") or ""
 
 local terminal = "kitty"
 local file_manager = "dolphin"
-local menu = "hyprlauncher"
+local menu = "vicinae open"
 local browser = "zen-browser"
 local main_mod = "SUPER"
 
@@ -19,7 +19,7 @@ hl.monitor({
   mode = "1920x1080@180",
   position = "0x0",
   scale = 1,
-  vrr = 0,
+  vrr = 2,
   transform = 0,
 })
 
@@ -42,6 +42,8 @@ hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("XDG_MENU_PREFIX", "plasma-")
 hl.env("XDG_SESSION_TYPE", "wayland")
 hl.env("PROTON_FSR4_UPGRADE", "1")
+hl.env("XCURSOR_THEME", "breeze_cursors")
+hl.env("XCURSOR_SIZE", "24")
 hl.env("PATH", path .. ":" .. home .. "/.dotnet/tools/")
 
 hl.config({
@@ -49,15 +51,19 @@ hl.config({
     gaps_in = 4,
     gaps_out = 8,
     border_size = 1,
-    ["col.active_border"] = "rgba(5259aaa8)",
+    ["col.active_border"] = "rgba(9a9b9ca8)",
     ["col.inactive_border"] = "rgba(585858a8)",
     resize_on_border = true,
     allow_tearing = true,
-    layout = "dwindle",
+    layout = "scrolling",
+  },
+
+  scrolling = {
+    column_width = 0.67
   },
 
   decoration = {
-    rounding = 14,
+    rounding = 8,
     active_opacity = 0.92,
     inactive_opacity = 0.86,
     fullscreen_opacity = 1.0,
@@ -106,8 +112,7 @@ hl.config({
   },
 
   render = {
-    direct_scanout = 2,
-    new_render_scheduling = false,
+    direct_scanout = 1,
   },
 
   debug = {
@@ -128,7 +133,7 @@ hl.config({
   },
 
   cursor = {
-    no_hardware_cursors = 0,
+    no_hardware_cursors = 2,
   },
 })
 
@@ -163,17 +168,31 @@ hl.animation({ leaf = "zoomFactor", enabled = true, speed = 7, bezier = "quick" 
 
 hl.on("hyprland.start", function()
   hl.exec_cmd("xrandr --output DP-2 --primary")
-  hl.exec_cmd([[gslapper -I "$XDG_RUNTIME_DIR/gslapper.sock" -o "loop" --fps-cap 30 '*' "$HOME/.wallpapers/cat1080.mp4"]])
-  hl.exec_cmd(home .. "/.config/hypr/scripts/gslapper-game-mode.sh")
-  hl.exec_cmd("hyprlauncher -d")
+  hl.exec_cmd("hyprpaper")
+  hl.exec_cmd("vicinae server")
   hl.exec_cmd("nm-applet")
   hl.exec_cmd("hypridle")
   hl.exec_cmd("swaync")
-  hl.exec_cmd("waybar")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
   hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")
   hl.exec_cmd([[gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"]])
   hl.exec_cmd([[gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"]])
+  hl.exec_cmd("waybar")
+end)
+
+hl.on("window.update_rules", function(window)
+  if window ~= nil
+    and window.active
+    and window.fullscreen_client == 1
+    and window.fullscreen_handler == "scrolling"
+  then
+    hl.dispatch(hl.dsp.window.fullscreen({
+      mode = "maximized",
+      action = "unset",
+      window = window,
+    }))
+    hl.dispatch(hl.dsp.layout("fit active"))
+  end
 end)
 
 bind_exec(main_mod .. " + SHIFT + C", home .. "/.local/bin/toggle-warp")
@@ -182,17 +201,23 @@ bind_exec(main_mod .. " + SHIFT + S", home .. "/.local/bin/sul-uploader")
 bind_exec(main_mod .. " + SHIFT + G", home .. "/.local/bin/osu-gamma")
 
 bind_exec(main_mod .. " + RETURN", terminal)
-hl.bind(main_mod .. " + SHIFT + Q", hl.dsp.window.kill())
-bind_exec(main_mod .. " + M", [[sh -c 'zenity --question --title "Exit Hyprland" --text "You pressed the exit shortcut. Do you really want to exit Hyprland? This will end your Wayland session." --ok-label "Yes, exit Hyprland" && hyprctl dispatch exit']])
+hl.bind(main_mod .. " + SHIFT + Q", hl.dsp.window.close())
+bind_exec(main_mod .. " + M", [[sh -c 'zenity --question --title "Exit Hyprland" --text "You pressed the exit shortcut. Do you really want to exit Hyprland? This will end your Wayland session." --ok-label "Yes, exit Hyprland" && hyprshutdown']])
 bind_exec(main_mod .. " + E", file_manager)
 bind_exec(main_mod .. " + B", browser)
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 bind_exec(main_mod .. " + R", menu)
 bind_exec(main_mod .. " + N", "swaync-client -t -sw")
+bind_exec(main_mod .. " + D", "vopono exec discord -p mullvad -c wireguard -s canada")
+hl.bind(main_mod .. " + SHIFT + bracketleft", hl.dsp.dpms(false))
+hl.bind(main_mod .. " + SHIFT + bracketright", hl.dsp.dpms(true))
 bind_exec(main_mod .. " + SHIFT + N", "swaync-client -d -sw")
 hl.bind(main_mod .. " + P", hl.dsp.window.pseudo({ action = "toggle" }))
 hl.bind(main_mod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(main_mod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+hl.bind(main_mod .. " + SHIFT + V", hl.dsp.layout("fit active"))
+hl.bind(main_mod .. " + period", hl.dsp.layout("move +col"))
+hl.bind(main_mod .. " + comma", hl.dsp.layout("swapcol l"))
 
 hl.bind(main_mod .. " + left", hl.dsp.focus({ direction = "l" }))
 hl.bind(main_mod .. " + right", hl.dsp.focus({ direction = "r" }))
@@ -234,11 +259,6 @@ end)
 
 hl.bind("XF86AudioPlay", hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "M", window = "class:^(discord)$" }))
 hl.bind("XF86AudioPause", hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "M", window = "class:^(discord)$" }))
-
-hl.window_rule({
-  match = { class = ".*" },
-  suppress_event = "maximize",
-})
 
 hl.window_rule({
   match = {
@@ -399,7 +419,7 @@ hl.layer_rule({
 
 hl.layer_rule({
   name = "hyprlauncher-style",
-  match = { namespace = "(hyprlauncher|launcher)" },
+  match = { namespace = "(hyprlauncher|launcher|vicinae)" },
   animation = "slidevert",
   blur = true,
   blur_popups = true,

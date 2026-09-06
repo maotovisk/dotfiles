@@ -1,12 +1,11 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 36, // Slightly taller for macOS feel
-  "width": 1920,
-  "margin-top": 0, // Small top gap for shadow effect
-  "margin-left": 16,
-  "margin-right": 16,
-  "spacing": 8, // More spacious macOS-like layout
+  "height": 32,
+  "margin-top": 8,
+  "margin-left": 8,
+  "margin-right": 8,
+  "spacing": 4,
   "fixed-center": true,
   "gtk-layer-shell": true,
   "output": ["DP-2"],
@@ -27,35 +26,14 @@
     "network",
   ],
 
-  // Workspaces - subtle backgrounds with separators
+  // Workspaces - compact numbered dots with a capsule for the focused workspace
   "hyprland/workspaces": {
-    "format": "{icon}",
-    "format-icons": {
-      "default": "○",
-      "urgent": "!",
-      "1": "1",
-      "2": "2",
-      "3": "3",
-      "4": "4",
-      "5": "5",
-      "6": "6",
-      "7": "7",
-      "8": "8",
-      "9": "9",
-      "10": "10",
-    },
+    "format": "{id}",
     "all-outputs": true,
+    "active-only": false,
     "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({workspace = \"e+1\"})'",
     "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({workspace = \"e-1\"})'",
-    "persistent_workspaces": {
-      "1": [],
-      "2": [],
-      "3": [],
-      "4": [],
-      "5": [],
-    },
-    "show-special": false,
-    "sort-by-number": true,
+    "sort-by": "number",
   },
 
   // Window title - elegant and informative
@@ -163,8 +141,8 @@
   // Notifications - swaync status
   "custom/notifications": {
     "return-type": "json",
-    "interval": 0,
-    "exec": "swaync-client -swb -sw",
+    "exec-if": "command -v swaync-client",
+    "exec": "swaync-client -swb",
     "on-click": "swaync-client -t -sw",
     "on-click-right": "swaync-client -d -sw",
     "on-click-middle": "swaync-client -C -sw",
@@ -194,11 +172,11 @@
       "on-scroll": 1,
       "on-click-right": "mode",
       "format": {
-        "months": "<span color='#74c7ec'><b>{}</b></span>",
-        "days": "<span color='#cdd6f4'><b>{}</b></span>",
-        "weeks": "<span color='#89b4fa'><b>W{}</b></span>",
-        "weekdays": "<span color='#a6e3a1'><b>{}</b></span>",
-        "today": "<span color='#f9e2af'><b><u>{}</u></b></span>",
+        "months": "<span color='#e0be73'><b>{}</b></span>",
+        "days": "<span color='#d7d2c8'><b>{}</b></span>",
+        "weeks": "<span color='#b9b5ad'><b>W{}</b></span>",
+        "weekdays": "<span color='#aabda9'><b>{}</b></span>",
+        "today": "<span color='#f1d69a'><b><u>{}</u></b></span>",
       },
     },
     "actions": {

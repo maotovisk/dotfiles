@@ -40,7 +40,7 @@ exec_always hyprpaper
 # Autostart (mirrors Hyprland exec-once)
 ##############################################################
 exec_always --no-startup-id nm-applet
-exec_always --no-startup-id mako
+exec --no-startup-id swaync
 exec --no-startup-id systemctl --user start hyprpolkitagent
 exec --no-startup-id gnome-keyring-daemon --start --components=secrets
 exec --no-startup-id swayidle -w timeout 500 'swaymsg "output * dpms off"' resume 'swaymsg "output * dpms on"'
