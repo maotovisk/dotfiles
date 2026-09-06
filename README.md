@@ -91,14 +91,38 @@ maot_dots/
 
 ### Screenshot Uploader Setup
 
+Standalone installer — a single self-contained file (the uploader is embedded,
+no need to clone the dotfiles). Works on Arch, Debian/Ubuntu, Fedora,
+openSUSE, and Alpine:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/maotovisk/dotfiles/main/install-sul-uploader.sh | bash
+```
+
+It detects your desktop and installed screenshot tools, lets you pick which
+backend `sul-uploader` should use (Hyprland grim+satty, grim+slurp, KDE
+Spectacle, Flameshot, or GNOME Screenshot — suggested automatically, e.g.
+Spectacle on KDE), installs dependencies (asks first), drops `sul-uploader`
+into `~/.local/bin`, and walks you through creating
+`~/.config/sul-uploader/config.ini`. On KDE Plasma it can also bind a global
+keybind for you (default `Meta+Shift+S`, checked for conflicts first).
+
+Options: `--backend <id>` to skip the menu, `--keybind "<keys>"` /
+`--no-keybind` for the KDE shortcut, `--force` to overwrite an existing
+config, `--yes` to auto-accept dependency installation, `--no-deps` to skip
+it. `sul-uploader --list-backends` shows backend status anytime, and
+`sul-uploader --backend <id>` overrides the config for one run.
+
+Manual setup, if you prefer:
+
 1. Create the config directory:
 ```bash
 mkdir -p ~/.config/sul-uploader
 ```
 
-2. Create config file:
+2. Create config file (`backend=` empty means auto-detect at runtime):
 ```bash
-echo "key=YOUR_S_UL_API_KEY" > ~/.config/sul-uploader/config.ini
+printf '[DEFAULT]\nkey=YOUR_S_UL_API_KEY\nbackend=\n' > ~/.config/sul-uploader/config.ini
 ```
 
 3. Get your API key from [s-ul.eu](https://s-ul.eu/)
@@ -152,8 +176,10 @@ All configuration files are symlinked to your home directory, so you can:
 
 ### Screenshot Uploader Issues
 - Ensure you have a valid API key in `~/.config/sul-uploader/config.ini`
-- Check that `hyprshot`, `curl`, `jq`, and `wl-clipboard` are installed
-- Verify you're running under Wayland (Hyprland)
+- Run `sul-uploader --list-backends` to see which backends are usable; set one
+  with `backend=<id>` in the config or switch at install time
+- On KDE, if the keybind does nothing after install, log out and back in once
+  (Plasma 6 does not reliably reload scripted shortcuts in-session)
 
 ### Installation Issues
 - Ensure you're running Arch Linux

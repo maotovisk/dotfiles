@@ -72,7 +72,9 @@ function install_sul_uploader() {
         print_info "Creating $CONFIG_INI"
         print_info "Get your key from https://s-ul.eu/account/preferences and paste it below."
         read -p "Enter the key for sul-uploader: " SUL_KEY
-        echo -e "[DEFAULT]\nkey=$SUL_KEY" > "$CONFIG_INI"
+        # backend= left empty: sul-uploader auto-detects the best installed
+        # backend at runtime (or set one: hyprland-satty|grim-slurp|spectacle|flameshot|gnome).
+        printf '[DEFAULT]\nkey=%s\nbackend=\n' "$SUL_KEY" > "$CONFIG_INI"
         print_info "Created $CONFIG_INI"
     fi
 }

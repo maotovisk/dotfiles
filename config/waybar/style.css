@@ -1,168 +1,352 @@
-/* Modern Liquid Glass Waybar */
+/* --------------------------------------------------
+ * Compact flat Waybar theme
+ * Neutral charcoal surfaces, warm highlights and restrained contrast.
+ * -------------------------------------------------- */
+
+/* Base ------------------------------------------------*/
 * {
     font-family:
-       "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
-    font-size: 13px;
-    font-weight: 500;
+        "Adwaita Sans",
+	"Arimo Nerd Font",
+        -apple-system,
+        system-ui,
+        sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #f2f0eb;
     margin: 0;
     padding: 0;
-    min-height: 0;
     border: none;
+    min-height: 0;
+    text-shadow: none;
 }
 
-/* Color Palette - Modern Glass */
-@define-color text           rgba(255, 255, 255, 0.95);
-@define-color text_secondary rgba(255, 255, 255, 0.75);
-@define-color text_muted     rgba(255, 255, 255, 0.6);
+/* Neutral/warm palette inspired by the launcher reference. */
+@define-color text      #f2f0eb;
+@define-color muted     #b9b5ad;
+@define-color accent    #c39a4a;
+@define-color accent_hi #e0be73;
+@define-color warn      #e0ad55;
+@define-color crit      #ef7068;
+@define-color good      #83bd8b;
 
-@define-color glass_bg       rgba(20, 20, 30, 0.6);
-@define-color glass_border   rgba(255, 255, 255, 0.1);
-@define-color glass_highlight rgba(255, 255, 255, 0.05);
-
-@define-color accent_primary #009AAF;
-@define-color accent_secondary #5856D6;
-@define-color accent_success #30D158;
-@define-color accent_warning #FF9F0A;
-@define-color accent_danger  #FF453A;
-@define-color accent_pink    #FF2D92;
-
-/* Main bar - Glass morphism */
+/* Waybar Window --------------------------------------*/
 window#waybar {
-    background: transparent;
-    border: 1px solid transparent;
-    margin: 0;
-    border-radius: 16px;
-    color: @text;
+    background: rgba(20, 20, 22, 0.92);
+    border-radius: 8px;
+    box-shadow: none;
 }
 
-/* Module containers - Glass cards */
-.modules-right,
+window#waybar > box {
+    padding: 2px 8px;
+}
+
+
+/* Module Group Containers (no extra backgrounds) -----*/
 .modules-left,
-.modules-center {
-    padding: 4px 8px;
+.modules-center,
+.modules-right {
+    padding: 0 2px;
 }
 
-/* Workspaces - Modern pill indicators */
+/* Universal Module Style (strip backgrounds) ---------*/
+#window,
+#clock,
+#clock.date,
+#cpu,
+#memory,
+#disk,
+#battery,
+#network,
+#pulseaudio,
+#pulseaudio.microphone,
+#keyboard-state,
+#custom-notifications,
+#tray,
+#custom-weather,
+#mpris {
+    background: transparent;
+    padding: 0 6px;
+    margin: 0 1px;
+    border: none;
+    font-weight: 600;
+}
+
+/* Tighten vertical space */
+#window,
+#clock,
+#clock.date,
+#cpu,
+#memory,
+#disk,
+#battery,
+#network,
+#pulseaudio,
+#pulseaudio.microphone,
+#keyboard-state,
+#custom-notifications,
+#tray,
+#custom-weather,
+#mpris {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+/* Workspaces (compact numbered dots) -----------------*/
 #workspaces {
-    padding: 0;
-    margin: 0;
+    padding: 0 2px;
+    margin: 0 2px 0 0;
     background: transparent;
 }
 
 #workspaces button {
-    color: @text_muted;
-    padding: 2px 4px;
-    margin: 0 2px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    font-weight: 500;
-    min-width: 24px;
+    background: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    padding: 7px 2px;
+    margin: 0;
+    border-radius: 0;
+    min-width: 16px;
+    min-height: 0;
+    opacity: 0.52;
+}
+
+#workspaces button label {
+    background: @muted;
+    border-radius: 999px;
+    padding: 0 4px;
+    min-width: 8px;
+    min-height: 14px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #141416;
+    transition:
+        min-width 180ms ease,
+        background-color 180ms ease,
+        opacity 180ms ease;
 }
 
 #workspaces button:hover {
+    background: transparent;
+    opacity: 0.82;
+}
+
+#workspaces button:hover label {
+    background: @text;
+}
+
+#workspaces button.active label {
+    background: @accent_hi;
+    min-width: 20px;
+}
+
+/* Visible on another monitor, but not globally focused. */
+#workspaces button.visible:not(.active) {
+    opacity: 0.9;
+}
+
+#workspaces button.visible:not(.active) label {
+    background: @accent;
+}
+
+#workspaces button.urgent label {
+    background: @crit;
+}
+
+#workspaces button.active,
+#workspaces button.urgent {
+    opacity: 1;
+}
+
+#workspaces button.urgent {
+    animation: urgent-pulse 1.4s ease-in-out infinite;
+}
+
+#workspaces button.empty:not(.active) {
+    opacity: 0.24;
+}
+
+#workspaces button:hover,
+#workspaces button:active,
+#workspaces button:checked,
+#workspaces button:focus {
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+@keyframes urgent-pulse {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.55;
+    }
+}
+
+/* Window Title ---------------------------------------*/
+#window {
+    font-size: 11px;
+    font-weight: 600;
     color: @text;
-    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.85;
 }
 
-#workspaces button.active {
-    color: @accent_primary;
-    background: rgba(0, 122, 255, 0.15);
-    border: 1px solid rgba(0, 122, 255, 0.2);
-    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+#window:hover {
+    opacity: 1;
 }
 
-#workspaces button.focused {
-    color: @accent_primary;
-    background: rgba(0, 122, 255, 0.1);
-    border: 1px solid rgba(0, 122, 255, 0.15);
+/* Clock ----------------------------------------------*/
+#clock {
+    font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
-/* System modules - Glass pills */
+#clock.date {
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+#clock.date:hover {
+    opacity: 1;
+}
+
+/* Stats & States -------------------------------------*/
 #cpu,
 #memory,
-#disk,
-#network,
-#pulseaudio,
-#tray,
-#battery {
-    color: @text;
-    padding: 6px 12px;
-    margin: 0 2px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid @glass_border;
-    transition: all 0.3s ease;
-    font-weight: 500;
+#disk {
+    opacity: 0.85;
 }
-
-#battery {
-    color: @accent_warning;
-    background: rgba(255, 159, 10, 0.1);
-}
-
-#battery.charging {
-    color: @accent_success;
-    background: rgba(48, 209, 88, 0.1);
-}
-
-#battery.warning:not(.charging) {
-    color: @accent_danger;
-    background: rgba(255, 69, 58, 0.1);
-}
-
-/* Clock - Premium glass card */
-#clock {
-    padding: 8px 16px;
-    margin: 0 4px;
-    color: @text;
-    font-weight: 700;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-    border-radius: 20px;
-    border: 1px solid @glass_border;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Window title - Subtle glass */
-#window {
-    font-size: 13px;
-    color: @text_secondary;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    margin: 0 4px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-/* Modern hover effects */
-#weather:hover,
-#clock:hover,
-#tray:hover,
-#pulseaudio:hover,
-#network:hover,
 #cpu:hover,
 #memory:hover,
-#battery:hover {
-    background: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+#disk:hover {
+    opacity: 1;
 }
 
-/* Tooltip styling - Modern glass tooltips */
-tooltip {
-    background: rgba(20, 20, 30, 0.9);
-    border: 1px solid @glass_border;
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin: 8px;
+#cpu.warning,
+#memory.warning,
+#disk.warning {
+    color: @warn;
+}
+#cpu.critical,
+#memory.critical,
+#disk.critical {
+    color: @crit;
+}
+
+#battery.good {
+    color: @good;
+}
+#battery.warning {
+    color: @warn;
+}
+#battery.critical {
+    color: @crit;
+}
+
+#network.disconnected {
+    color: @crit;
+}
+
+#pulseaudio.muted {
+    color: @crit;
+}
+
+/* Keyboard State -------------------------------------*/
+#keyboard-state {
+    font-size: 10px;
+    opacity: 0.7;
+}
+#keyboard-state:hover {
+    opacity: 1;
+}
+
+/* Tray ------------------------------------------------*/
+#tray > .passive {
+    opacity: 0.55;
+}
+#tray > .needs-attention {
+    color: @crit;
+    font-weight: 700;
+}
+
+#custom-notifications {
+    background: transparent;
+    padding: 3px 6px;
+    margin: 3px 6px 3px 2px;
+    border-radius: 6px;
+    min-width: 28px;
+    box-shadow: none;
+    transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+#custom-notifications:hover {
+    background: rgba(255, 248, 232, 0.12);
+}
+
+#custom-notifications.notification,
+#custom-notifications.inhibited-notification {
+    background: rgba(224, 190, 115, 0.18);
     color: @text;
-    font-size: 12px;
-    font-weight: 500;
+    box-shadow: none;
+}
+
+#custom-notifications.dnd-none,
+#custom-notifications.dnd-notification,
+#custom-notifications.dnd-inhibited-none,
+#custom-notifications.dnd-inhibited-notification {
+    color: @warn;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#custom-notifications.inhibited-none,
+#custom-notifications.inhibited-notification {
+    opacity: 0.72;
+}
+
+#custom-notifications.cc-open {
+    border-color: rgba(224, 190, 115, 0.42);
+    background: rgba(224, 190, 115, 0.12);
+    box-shadow: none;
+}
+
+/* Focus (Keyboard Nav) -------------------------------*/
+button:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.35);
+    outline-offset: 2px;
+}
+
+/* Tooltips -------------------------------------------*/
+tooltip {
+    background: rgba(18, 18, 20, 0.94);
+    color: @text;
+    border: 1px solid rgba(255, 248, 232, 0.13);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
 }
 
 tooltip label {
+    padding: 0;
     color: @text;
-    padding: 8px 12px;
-    font-family: "Adwaita Sans", "JetBrainsMonoNL NFP", sans-serif;
+}
+
+/* Optional: remove unwanted spacing between groups */
+.modules-left > *:first-child,
+.modules-center > *:first-child,
+.modules-right > *:first-child {
+    margin-left: 0;
+}
+.modules-left > *:last-child,
+.modules-center > *:last-child,
+.modules-right > *:last-child {
+    margin-right: 0;
 }

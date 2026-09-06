@@ -1,0 +1,499 @@
+################
+### MONITORS ###
+################
+monitorv2 {
+  output = DP-2
+  mode = 1920x1080@180
+  position = 0x0
+  scale = 1
+  vrr = 1
+  transform = 0
+}
+
+monitorv2 {
+  output = DP-1
+  mode = 1920x1080@144
+  position = 1920x0
+  scale = 1
+  vrr = 0
+}
+
+workspace = 1, monitor:DP-2
+workspace = 2, monitor:DP-1
+exec-once = xrandr --output DP-2 --primary
+
+####################
+### Default Apps ###
+####################
+$terminal    = kitty
+$fileManager = dolphin
+$menu        = hyprlauncher
+$browser     = zen-browser
+
+#################
+### AUTOSTART ###
+#################
+#exec-once = hyprpaper
+exec-once = gslapper -I "$XDG_RUNTIME_DIR/gslapper.sock" -o "loop" --fps-cap 30 '*' "$HOME/.wallpapers/cat1080.mp4"
+exec-once = ~/.config/hypr/scripts/gslapper-game-mode.sh
+exec-once = hyprlauncher -d
+exec-once = nm-applet
+exec-once = hypridle
+exec-once = swaync
+exec-once = waybar
+exec-once = systemctl --user start hyprpolkitagent
+exec-once = gnome-keyring-daemon --start --components=secrets
+exec = gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"   # for GTK4 apps
+exec = gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"   # for GTK3 apps
+
+#############################
+### ENVIRONMENT VARIABLES ###
+#############################
+
+## Wayland / Toolkit
+env = MOZ_ENABLE_WAYLAND,1
+env = QT_QPA_PLATFORMTHEME,qt6ct
+env = QT_QPA_PLATFORM,wayland
+env = XDG_CURRENT_DESKTOP,Hyprland
+env = XDG_SESSION_DESKTOP,Hyprland
+env = XDG_MENU_PREFIX,plasma-
+env = XDG_SESSION_TYPE,wayland
+#env = SDL_VIDEODRIVER,wayland
+#env = WEBKIT_DISABLE_DMABUF_RENDERER,1
+env = PROTON_FSR4_UPGRADE,1
+
+cursor:no_hardware_cursors=false
+
+## JetBrains Rider workaround (EF tools)
+env = PATH,"$PATH:$HOME/.dotnet/tools/"
+
+#####################
+### LOOK AND FEEL ###
+#####################
+general {
+  gaps_in            = 4
+  gaps_out           = 8
+  border_size        = 1
+  col.active_border  = rgba(5259aaa8)
+  col.inactive_border= rgba(585858a8)
+  resize_on_border   = true
+  allow_tearing      = true
+  layout             = dwindle
+}
+
+decoration {
+  rounding = 14
+
+  # Liquid-glass translucency
+  active_opacity = 0.92
+  inactive_opacity = 0.86
+  fullscreen_opacity = 1.0
+
+  blur {
+    enabled = true
+
+    # Aumentar passes e diminuir size cria o efeito "leitoso/fosco"
+    size = 8
+    passes = 2
+
+    # Otimizações de performance
+    new_optimizations = true
+
+    # Faz o blur funcionar mesmo se a janela tiver opacidade definida por regra
+    ignore_opacity = true
+
+    # --- Ajustes de Cor e Textura ---
+    # Adiciona um pouco de ruído para prevenir "color banding" (faixas de cor) em monitores
+    noise = 0.02
+
+    # Aumenta o contraste para destacar o texto atrás do blur
+    contrast = 0.95
+
+    # Reduz levemente o brilho para dar profundidade
+    brightness = 0.9
+
+    # Aumenta a saturação das cores atrás do vidro (efeito moderno)
+    vibrancy = 0.2
+    vibrancy_darkness = 0.0
+
+    # --- Popups ---
+    popups = true
+    popups_ignorealpha = 0.6 # Reduzi para pegar popups levemente transparentes também
+  }
+
+  shadow {
+    enabled = true
+    range = 10
+    render_power = 3
+    color = rgba(00000066)
+  }
+}
+
+
+animations {
+    enabled = yes, please :)
+
+    # Default curves, see https://wiki.hypr.land/Configuring/Animations/#curves
+    #        NAME,           X0,   Y0,   X1,   Y1
+    bezier = easeOutQuint,   0.23, 1,    0.32, 1
+    bezier = eioc, 0.65, 0.05, 0.36, 1
+    bezier = linear,         0,    0,    1,    1
+    bezier = almostLinear,   0.5,  0.5,  0.75, 1
+    bezier = quick,          0.15, 0,    0.1,  1
+
+    # Default animations, see https://wiki.hypr.land/Configuring/Animations/
+    #           NAME,          ONOFF, SPEED, CURVE,        [STYLE]
+    animation = global,        1,     10,    default
+    animation = border,        1,     5.39,  easeOutQuint
+    animation = windows,       1,     4.79,  easeOutQuint, slide
+    animation = windowsIn,     1,     4.1,   easeOutQuint, popin 87%
+    animation = windowsOut,    1,     1.49,  linear,       popin 87%
+    animation = fadeIn,        1,     1.73,  almostLinear
+    animation = fadeOut,       1,     1.46,  almostLinear
+    animation = fade,          1,     3.03,  quick
+    animation = layers,        1,     3.81,  easeOutQuint
+    animation = layersIn,      1,     4,     easeOutQuint, fade
+    animation = layersOut,     1,     1.5,   linear,       fade
+    animation = fadeLayersIn,  1,     1.79,  almostLinear
+    animation = fadeLayersOut, 1,     1.39,  almostLinear
+    animation = workspaces,    1,     1.94,  almostLinear, fade
+    animation = workspacesIn,  1,     5,     easeOutQuint, slide
+    animation = workspacesOut, 1,     5,     easeOutQuint, slide
+    animation = zoomFactor,    1,     7,     quick
+}
+
+dwindle {
+  pseudotile      = true
+  preserve_split  = true
+}
+
+master {
+  new_status = master
+}
+
+misc {
+  force_default_wallpaper = 0
+  enable_anr_dialog       = false
+  disable_hyprland_logo   = false
+  middle_click_paste = false
+  vfr                     = 1
+  vrr                     = 1
+}
+
+render {
+  direct_scanout          = 2
+  new_render_scheduling   = false
+}
+
+debug {
+    overlay = false
+}
+#############
+### INPUT ###
+#############
+input {
+  kb_layout  = us,br
+  kb_variant = alt-intl,abnt2
+  kb_options = grp:rctrl_toggle
+
+  follow_mouse = 1
+  accel_profile = flat
+  sensitivity = 0
+
+  touchpad {
+    natural_scroll = false
+  }
+}
+device {
+  name = opentabletdriver-virtual-artist-tablet
+  output = DP-2
+}
+###################
+### KEYBINDINGS ###
+###################
+$mainMod = SUPER
+
+## warp toggle
+bind = $mainMod SHIFT, C, exec, /home/maoto/.local/bin/toggle-warp
+
+## reload waybar
+bind = $mainMod SHIFT, Z, exec, pkill waybar && waybar
+
+## screenshot and upload to s-ul
+bind = $mainMod SHIFT, S, exec, /home/maoto/.local/bin/sul-uploader
+bind = $mainMod SHIFT, G, exec, /home/maoto/.local/bin/osu-gamma
+
+bind = $mainMod, RETURN, exec, $terminal
+bind = $mainMod SHIFT, Q, killactive,
+bind = $mainMod, M, exec, sh -c 'zenity --question --title "Exit Hyprland" --text "You pressed the exit shortcut. Do you really want to exit Hyprland? This will end your Wayland session." --ok-label "Yes, exit Hyprland" && hyprctl dispatch exit'
+bind = $mainMod, E, exec, $fileManager
+bind = $mainMod, B, exec, $browser
+bind = $mainMod, V, togglefloating,
+bind = $mainMod, R, exec, $menu
+bind = $mainMod, N, exec, swaync-client -t -sw
+bind = $mainMod SHIFT, N, exec, swaync-client -d -sw
+bind = $mainMod, P, pseudo,
+bind = $mainMod, J, togglesplit,
+bind = $mainMod, F, fullscreen,
+
+# Move focus with mainMod + arrow keys
+bind = $mainMod, left,  movefocus, l
+bind = $mainMod, right, movefocus, r
+bind = $mainMod, up,    movefocus, u
+bind = $mainMod, down,  movefocus, d
+
+# Switch workspaces with mainMod + [0-9]
+bind = $mainMod, 1, workspace, 1
+bind = $mainMod, 2, workspace, 2
+bind = $mainMod, 3, workspace, 3
+bind = $mainMod, 4, workspace, 4
+bind = $mainMod, 5, workspace, 5
+bind = $mainMod, 6, workspace, 6
+bind = $mainMod, 7, workspace, 7
+bind = $mainMod, 8, workspace, 8
+bind = $mainMod, 9, workspace, 9
+bind = $mainMod, 0, workspace, 10
+
+# Move active window to a workspace with mainMod + SHIFT + [0-9]
+bind = $mainMod SHIFT, 1, movetoworkspace, 1
+bind = $mainMod SHIFT, 2, movetoworkspace, 2
+bind = $mainMod SHIFT, 3, movetoworkspace, 3
+bind = $mainMod SHIFT, 4, movetoworkspace, 4
+bind = $mainMod SHIFT, 5, movetoworkspace, 5
+bind = $mainMod SHIFT, 6, movetoworkspace, 6
+bind = $mainMod SHIFT, 7, movetoworkspace, 7
+bind = $mainMod SHIFT, 8, movetoworkspace, 8
+bind = $mainMod SHIFT, 9, movetoworkspace, 9
+bind = $mainMod SHIFT, 0, movetoworkspace, 10
+
+# Scroll through existing workspaces with mainMod + scroll
+bind = $mainMod, mouse_down, workspace, e+1
+bind = $mainMod, mouse_up,   workspace, e-1
+
+# Move/resize windows with mainMod + LMB/RMB
+bindm = $mainMod, mouse:272, movewindow
+bindm = $mainMod, mouse:273, resizewindow
+
+bind = ALT, Tab, cyclenext, hist
+bind = ALT, Tab, bringactivetotop
+
+## bluetooth discord unmute
+bind = ,XF86AudioPlay, sendshortcut, CTRL SHIFT, M, class:^(discord)$
+
+bind = ,XF86AudioPause, sendshortcut, CTRL SHIFT, M, class:^(discord)$
+
+####################
+### WINDOW RULES ###
+####################
+
+##############################
+###     GLOBAL / GENERIC   ###
+##############################
+
+# Ignora evento de maximizar em tudo (padrão do Hyprland para evitar comportamento do X11)
+windowrule = match:class .*, suppress_event maximize
+
+# "Ghost windows" fix (XWayland e janelas vazias não devem receber foco)
+windowrule = match:class ^$, match:title ^$, match:xwayland 1, match:float 1, match:fullscreen 0, match:pin 0, no_focus on
+
+# Tearing para Jogos (Ativa immediate se o cliente pedir fullscreen)
+# Nota: match:fullscreen_state_client 2 refere-se ao estado FULLSCREEN (não apenas maximizado)
+windowrule = match:fullscreen_state_client 2, immediate on
+
+##############################
+###      APP SPECIFIC      ###
+##############################
+
+# --- Jetbrains IDEs Fix ---
+windowrule {
+    name = jetbrains-toolbox
+    match:class = jetbrains-toolbox
+    match:float = 1
+
+    no_initial_focus = on
+}
+
+windowrule {
+    name = jetbrains-popups
+    match:class = (jetbrains-)(.*)
+    match:title = ^win(.*)
+
+    no_initial_focus = on
+}
+
+windowrule {
+    name = jetbrains-splash
+    match:class = (jetbrains-)(.*)
+    match:title = ^$
+    match:float = 1
+
+    size = 672 700
+}
+
+# --- Firefox / Zen Browser PiP ---
+windowrule {
+    name = picture-in-picture
+    match:title = (.*)(Picture-in-Picture)
+
+    float = on
+}
+
+# --- Vesktop / Discord (Comentado) ---
+# windowrule {
+#    name = vesktop-privacy
+#    match:initial_class = (vesktop)
+#    no_screen_share = on
+# }
+
+# --- Satty (Screenshot Tool) ---
+windowrule {
+    name = satty-rules
+    match:class = (com.gabm.satty)(.*)
+
+    # Desativa tearing no Satty (para evitar glitches ao editar print)
+    immediate = false
+    # Remove animação
+    no_anim = on
+}
+#--- osu! Editor Rules ---
+windowrule {
+    name = osu-editor-l-popups-stable
+    match:class = (osu!.exe)
+    match:float = 1
+    match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
+
+    stay_focused = on
+}
+
+#  windowrule=noinitialfocus, class:(osu!.exe), title:^$, initialTitle:^$, floating:1
+windowrule {
+    name = osu-editor-l-tooltips-stable
+    match:class = ^(osu!.exe)$
+    match:title = ^$
+    match:initial_title = ^$
+    match:float = true
+    no_initial_focus = on
+}
+# --- osu! Editor Rules ---
+windowrule {
+    name = osu-editor-popups-stable
+    match:class = (osu_stable)
+    match:float = 1
+    match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
+
+    stay_focused = on
+}
+
+#  windowrule=noinitialfocus, class:(osu!.exe), title:^$, initialTitle:^$, floating:1
+windowrule {
+    name = osu-editor-tooltips-stable
+    match:class = ^(osu_stable)$
+    match:title = ^$
+    match:initial_title = ^$
+    match:float = true
+    no_initial_focus = on
+}
+
+# --- osu! Editor (unstable)
+#osu-unstable-exe
+windowrule {
+    name = osu-editor-tooltips
+    match:class = ^(osu-unstable-exe)$
+    match:title = ^$
+    match:initial_title = ^$
+    match:float = true
+    no_initial_focus = on
+}
+
+windowrule {
+    name = osu-editor-popups
+    match:class = (osu-unstable-exe)
+    match:float = 1
+    match:title = (.*)((Rotate by)|(Scale by)|(Polygonal Circle Creation)|(Timing and Control Points))
+
+    stay_focused = on
+}
+
+
+
+# --- GPU Screen Recorder ---
+windowrule {
+    name = gsr-ui
+    match:title = (gsr ui)
+
+    no_blur = false
+    stay_focused = on
+}
+
+# --- Portals (File pickers, etc) ---
+windowrule {
+    name = kde-portal
+    match:class = (org.freedesktop.impl.portal.desktop.kde)
+
+    float = on
+}
+
+windowrule {
+    name = gtk-portal
+    match:class = (xdg-desktop-portal-gtk)
+
+    float = on
+}
+
+
+##############################
+###      LAYER RULES       ###
+##############################
+
+layerrule {
+    name = wofi-style
+    match:namespace = wofi
+
+    animation = slidevert
+    blur = on
+}
+
+layerrule {
+    name = hyprlauncher-style
+    match:namespace = (hyprlauncher|launcher)
+
+    animation = slidevert
+    blur = on
+    blur_popups = on
+    ignore_alpha = 0.35
+}
+layerrule {
+    name = screenshare-picker
+    match:namespace = (ch.wysbd.hyprland-preview-share-picker)
+
+    animation = slidevert
+    blur = on
+    blur_popups = on
+    ignore_alpha = 0.35
+}
+
+layerrule {
+    name = waybar-anim
+    match:namespace = waybar
+
+    animation = slidevert
+}
+
+layerrule {
+    name = swaync-style
+    match:namespace = swaync-control-center
+
+    animation = slide top
+    blur = on
+    blur_popups = on
+    ignore_alpha = 0.5
+}
+
+layerrule {
+    name = swaync-notifications-style
+    match:namespace = swaync-notification-window
+
+    blur = on
+    blur_popups = on
+    ignore_alpha = 0.3
+}

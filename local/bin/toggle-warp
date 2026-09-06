@@ -1,0 +1,29 @@
+#!/bin/bash
+
+APP_NAME="Cloudflare WARP Toggler"
+ICON_CONNECTED=network-vpn
+ICON_DISCONNECTED=network-offline
+ICON_ERROR=dialog-warning
+
+# Check if warp-cli is installed
+if ! command -v warp-cli &> /dev/null; then
+    echo "warp-cli not found. Please install Cloudflare WARP first."
+    notify-send --app-name="$APP_NAME" -u critical -i "$ICON_ERROR" "WARP Toggle" "warp-cli not found.\nPlease install Cloudflare WARP."
+    exit 1
+fi
+
+# Get current status
+status=$(warp-cli status | grep "Status update:" | awk '{print $3}')
+
+if [ "$status" = "Connected" ]; then
+    echo "WARP is currently connected. Disconnecting..."
+    warp-cli disconnect
+    notify-send --app-name="$APP_NAME" -u normal -i "$ICON_DISCONNECTED" "🌐 WARP Disabled"
+elif [ "$status" = "Disconnected" ]; then
+    echo "WARP is currently disconnected. Connecting..."
+    warp-cli connect
+    notify-send --app-name="$APP_NAME" -u normal -i "$ICON_CONNECTED" "🌐 WARP Enabled"
+else
+    echo "Unknown status: $status"
+    notify-send --app-name="$APP_NAME" -u normal -i "$ICON_ERROR" "🌐 WARP Status Unknown" "Unable to detect WARP status: $status"
+fi

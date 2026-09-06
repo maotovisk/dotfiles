@@ -1,0 +1,29 @@
+{
+  // Jay exposes workspaces through ext-workspace-v1. Everything else is
+  // inherited from the Hyprland bar so both sessions keep the same styling.
+  "include": ["/home/maoto/.config/waybar/config.jsonc"],
+  "output": ["DP-2", "DP-1"],
+  "modules-left": ["ext/workspaces"],
+
+  "ext/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "○",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10"
+    },
+    "on-click": "activate",
+    "all-outputs": true,
+    "active-only": false,
+    "ignore-hidden": false,
+    "sort-by-name": true
+  }
+}

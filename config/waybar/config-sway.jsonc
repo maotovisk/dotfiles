@@ -1,22 +1,24 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 32,
-  "margin-top": 8,
-  "margin-left": 8,
-  "margin-right": 8,
-  "spacing": 4,
+  "height": 36,
+  "width": 1920,
+  "margin-top": 0,
+  "margin-left": 16,
+  "margin-right": 16,
+  "spacing": 8,
   "fixed-center": true,
   "gtk-layer-shell": true,
-  "output": ["DP-2"],
+  "output": ["DP-1"],
   "mode": "dock",
   "exclusive": false,
 
-  // Module layout - optimized for readability
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  // Module layout
+  "modules-left": ["sway/workspaces", "sway/window"],
   "modules-center": ["clock", "clock#date", "mpris", "custom/weather"],
   "modules-right": [
     "custom/notifications",
+    "keyboard-state",
     "tray",
     "cpu",
     "memory",
@@ -26,18 +28,37 @@
     "network",
   ],
 
-  // Workspaces - compact numbered dots with a capsule for the focused workspace
-  "hyprland/workspaces": {
-    "format": "{id}",
+  // Workspaces - adaptado para Sway
+  "sway/workspaces": {
+    "format": "{icon}",
+    "format-icons": {
+      "default": "○",
+      "urgent": "!",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+    },
+    "on-click": "activate",
     "all-outputs": true,
-    "active-only": false,
-    "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({workspace = \"e+1\"})'",
-    "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({workspace = \"e-1\"})'",
-    "sort-by": "number",
+    "persistent_workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+    },
+    "sort-by-number": true,
   },
 
-  // Window title - elegant and informative
-  "hyprland/window": {
+  // Window title - adaptado para Sway
+  "sway/window": {
     "format": "{}",
     "max-length": 50,
     "separate-outputs": false,
@@ -47,18 +68,18 @@
       "(.*) - vim": " $1",
       "(.*) - zsh": " [$1]",
     },
-    "icon": false,
+    "icon": true,
     "icon-size": 14,
   },
 
-  // System monitoring - modern and informative
+  // System monitoring
   "cpu": {
     "interval": 1,
     "format": "󰍛 {usage}%",
     "format-alt": "󰍛 {avg_frequency}GHz",
     "tooltip-format": "Usage: {usage}%\nFrequency: {avg_frequency}GHz\nCores: {load}",
-    "on-click": "kitty --class=monitor btop",
-    "on-click-right": "kitty --class=monitor htop",
+    "on-click": "ghostty --class=monitor btop",
+    "on-click-right": "ghostty --class=monitor htop",
     "states": {
       "warning": 70,
       "critical": 90,
@@ -69,7 +90,7 @@
     "format": "󰾆 {percentage}%",
     "format-alt": "󰾆 {used:0.1f}G",
     "tooltip-format": "Used: {used:0.1f}GB / {total:0.1f}GB\nAvailable: {avail:0.1f}GB\nSwap: {swapUsed:0.1f}GB / {swapTotal:0.1f}GB",
-    "on-click": "kitty --class=monitor btop",
+    "on-click": "ghostty --class=monitor btop",
     "states": {
       "warning": 80,
       "critical": 95,
@@ -81,14 +102,14 @@
     "format-alt": "󰋊 {free}",
     "path": "/",
     "tooltip-format": "Used: {used} / {total}\nFree: {free} ({percentage_free}%)\nPath: {path}",
-    "on-click": "kitty --class=fileman ranger",
+    "on-click": "ghostty --class=fileman ranger",
     "states": {
       "warning": 80,
       "critical": 95,
     },
   },
 
-  // Audio controls - comprehensive and modern
+  // Audio controls
   "pulseaudio": {
     "format": "{icon} {volume}%",
     "format-bluetooth": "󰂯 {volume}%",
@@ -121,7 +142,7 @@
     "tooltip-format": "Microphone: {volume}%",
   },
 
-  // Network - comprehensive status
+  // Network
   "network": {
     "format-wifi": "󰤨 {essid}",
     "format-ethernet": "󰈀 {ipaddr}",
@@ -133,12 +154,12 @@
     "tooltip-format-ethernet": "Interface: {ifname}\nIP: {ipaddr}\nSpeed: {bandwidthDownBits}/s down, {bandwidthUpBits}/s up",
     "tooltip-format-disconnected": "Network disconnected",
     "on-click": "nm-connection-editor",
-    "on-click-right": "kitty --class=netmon nmtui",
+    "on-click-right": "ghostty --class=netmon nmtui",
     "interval": 2,
     "max-length": 25,
   },
 
-  // Notifications - swaync status
+  // Notifications - live swaync status
   "custom/notifications": {
     "return-type": "json",
     "exec-if": "command -v swaync-client",
@@ -147,10 +168,10 @@
     "on-click-right": "swaync-client -d -sw",
     "on-click-middle": "swaync-client -C -sw",
     "format": "\uf0f3 {}",
-    "tooltip": true
+    "tooltip": true,
   },
 
-  // Clock - elegant time display
+  // Clock
   "clock": {
     "interval": 1,
     "format": "{:%H:%M}",
@@ -194,7 +215,8 @@
     "show-passive-items": true,
     "reverse-direction": true,
   },
-  // Weather - elegant display
+
+  // Weather
   "custom/weather": {
     "exec": "~/.config/waybar/weather.py",
     "return-type": "json",
@@ -204,7 +226,7 @@
     "on-click": "xdg-open 'https://weather.com'",
   },
 
-  // Media player - comprehensive display
+  // Media player
   "mpris": {
     "format": "{player_icon} {dynamic}",
     "format-paused": "{status_icon} <i>{dynamic}</i>",
@@ -231,6 +253,16 @@
     "on-scroll-down": "playerctl volume 0.1-",
     "smooth-scrolling-threshold": 1,
     "tooltip-format": "{player}: {title} - {artist}\nAlbum: {album}",
+  },
+
+  "keyboard-state": {
+    "numlock": true,
+    "capslock": true,
+    "format": "{name} {icon}",
+    "format-icons": {
+      "locked": "󰌾",
+      "unlocked": "󰌿",
+    },
   },
 
   // Battery (if laptop)
