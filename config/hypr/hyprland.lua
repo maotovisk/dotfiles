@@ -181,20 +181,15 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("qs")
 end)
 
-hl.on("window.update_rules", function(window)
-  if window ~= nil
-    and window.active
-    and window.fullscreen_client == 1
-    and window.fullscreen_handler == "scrolling"
-  then
-    hl.dispatch(hl.dsp.window.fullscreen({
-      mode = "maximized",
-      action = "unset",
-      window = window,
-    }))
-    hl.dispatch(hl.dsp.layout("fit active"))
-  end
-end)
+-- Apps asking to be maximized: ignore the request. In the scrolling layout a
+-- lone column already fills the screen, and un-maximizing afterwards (the old
+-- window.update_rules hook) left Hyprland 0.57 with the Top-layer fade stuck
+-- at 0 — the bar vanished until the next workspace switch.
+hl.window_rule({
+  name = "suppress-maximize",
+  match = { class = ".*" },
+  suppress_event = "maximize",
+})
 
 bind_exec(main_mod .. " + SHIFT + C", home .. "/.local/bin/toggle-warp")
 bind_exec(main_mod .. " + C", "qs ipc call shell toggleCalendar")
