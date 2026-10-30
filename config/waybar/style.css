@@ -1,19 +1,32 @@
-/* --------------------------------------------------
- * Compact flat Waybar theme
- * Neutral charcoal surfaces, warm highlights and restrained contrast.
- * -------------------------------------------------- */
+/* ═══════════════════════════════════════════════════════════════════
+ * Vesper · floating islands
+ * Near-black glass, peach light, mint accents.
+ * bg #101010 · fg #ffffff · peach #ffc799 · mint #99ffe4
+ * red #ff8080 · blue #9db2e8 · muted #8b8b8b · border #282828
+ * ═══════════════════════════════════════════════════════════════════ */
 
-/* Base ------------------------------------------------*/
+@define-color bg       #101010;
+@define-color text     #ffffff;
+@define-color soft     #d8d8d8;
+@define-color muted    #8b8b8b;
+@define-color dim      #6e6e6e;
+@define-color peach    #ffc799;
+@define-color peach_hi #ffcfa8;
+@define-color mint     #99ffe4;
+@define-color red      #ff8080;
+@define-color blue     #9db2e8;
+
+/* Base ---------------------------------------------------------------*/
 * {
     font-family:
-        "Adwaita Sans",
-	"Arimo Nerd Font",
-        -apple-system,
-        system-ui,
-        sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: #f2f0eb;
+        "CaskaydiaCove Nerd Font Mono",
+        "CaskaydiaMono Nerd Font Mono",
+        "Arimo Nerd Font",
+        "Font Awesome 7 Free",
+        monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: @soft;
     margin: 0;
     padding: 0;
     border: none;
@@ -21,35 +34,43 @@
     text-shadow: none;
 }
 
-/* Neutral/warm palette inspired by the launcher reference. */
-@define-color text      #f2f0eb;
-@define-color muted     #b9b5ad;
-@define-color accent    #c39a4a;
-@define-color accent_hi #e0be73;
-@define-color warn      #e0ad55;
-@define-color crit      #ef7068;
-@define-color good      #83bd8b;
-
-/* Waybar Window --------------------------------------*/
 window#waybar {
-    background: rgba(20, 20, 22, 0.92);
-    border-radius: 8px;
+    background: transparent;
+    border: none;
     box-shadow: none;
 }
 
 window#waybar > box {
-    padding: 2px 8px;
+    padding: 3px 8px;
 }
 
-
-/* Module Group Containers (no extra backgrounds) -----*/
+/* Islands ------------------------------------------------------------*/
 .modules-left,
 .modules-center,
 .modules-right {
-    padding: 0 2px;
+    background-image: linear-gradient(
+        180deg,
+        rgba(26, 26, 26, 0.72) 0%,
+        rgba(16, 16, 16, 0.80) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 15px;
+    padding: 0 9px;
+    margin: 0 5px;
+    min-height: 32px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 8px 22px rgba(0, 0, 0, 0.45);
+    transition: border-color 220ms ease, box-shadow 220ms ease;
 }
 
-/* Universal Module Style (strip backgrounds) ---------*/
+.modules-left:hover,
+.modules-center:hover,
+.modules-right:hover {
+    border-color: rgba(255, 199, 153, 0.16);
+}
+
+/* Module shell -------------------------------------------------------*/
 #window,
 #clock,
 #clock.date,
@@ -64,39 +85,40 @@ window#waybar > box {
 #custom-notifications,
 #tray,
 #custom-weather,
+#custom-eq,
 #mpris {
     background: transparent;
-    padding: 0 6px;
+    color: @muted;
+    padding: 0 7px;
     margin: 0 1px;
-    border: none;
-    font-weight: 600;
+    border-radius: 9px;
+    transition:
+        background-color 170ms ease,
+        color 170ms ease,
+        opacity 170ms ease;
 }
 
-/* Tighten vertical space */
-#window,
-#clock,
-#clock.date,
-#cpu,
-#memory,
-#disk,
-#battery,
-#network,
-#pulseaudio,
-#pulseaudio.microphone,
-#keyboard-state,
-#custom-notifications,
-#tray,
-#custom-weather,
-#mpris {
-    padding-top: 2px;
-    padding-bottom: 2px;
+/* Hover: a warm ember behind the pointer, never larger than the content */
+#clock:hover,
+#clock.date:hover,
+#cpu:hover,
+#memory:hover,
+#disk:hover,
+#network:hover,
+#pulseaudio:hover,
+#pulseaudio.microphone:hover,
+#custom-weather:hover,
+#custom-eq:hover,
+#mpris:hover {
+    background-color: rgba(255, 199, 153, 0.08);
+    color: @text;
 }
 
-/* Workspaces (compact numbered dots) -----------------*/
+/* Workspaces ---------------------------------------------------------*/
 #workspaces {
+    background: transparent;
     padding: 0 2px;
     margin: 0 2px 0 0;
-    background: transparent;
 }
 
 #workspaces button {
@@ -105,67 +127,67 @@ window#waybar > box {
     border: none;
     box-shadow: none;
     outline: none;
-    padding: 7px 2px;
-    margin: 0;
-    border-radius: 0;
-    min-width: 16px;
+    padding: 0 1px;
+    margin: 0 1px;
+    border-radius: 8px;
+    min-width: 20px;
     min-height: 0;
-    opacity: 0.52;
+    transition: background-color 180ms ease;
 }
 
 #workspaces button label {
-    background: @muted;
-    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.06);
+    color: @dim;
+    border-radius: 7px;
     padding: 0 4px;
-    min-width: 8px;
-    min-height: 14px;
-    font-size: 9px;
+    min-width: 12px;
+    min-height: 18px;
+    font-size: 10px;
     font-weight: 700;
-    color: #141416;
     transition:
-        min-width 180ms ease,
+        min-width 240ms cubic-bezier(0.22, 1, 0.36, 1),
         background-color 180ms ease,
-        opacity 180ms ease;
+        color 180ms ease,
+        box-shadow 180ms ease;
 }
 
 #workspaces button:hover {
     background: transparent;
-    opacity: 0.82;
 }
 
 #workspaces button:hover label {
-    background: @text;
+    background-color: rgba(255, 255, 255, 0.18);
+    color: @text;
 }
 
+/* Focused workspace: peach capsule that widens as it takes focus */
 #workspaces button.active label {
-    background: @accent_hi;
-    min-width: 20px;
+    background-color: @peach;
+    color: @bg;
+    min-width: 22px;
+    box-shadow: 0 0 12px rgba(255, 199, 153, 0.35);
 }
 
-/* Visible on another monitor, but not globally focused. */
-#workspaces button.visible:not(.active) {
-    opacity: 0.9;
+#workspaces button.active:hover label {
+    background-color: @peach_hi;
 }
 
+/* Alive on another monitor */
 #workspaces button.visible:not(.active) label {
-    background: @accent;
+    background-color: rgba(255, 199, 153, 0.24);
+    color: @peach_hi;
+}
+
+#workspaces button.empty:not(.active) label {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.18);
+    min-width: 8px;
 }
 
 #workspaces button.urgent label {
-    background: @crit;
-}
-
-#workspaces button.active,
-#workspaces button.urgent {
-    opacity: 1;
-}
-
-#workspaces button.urgent {
-    animation: urgent-pulse 1.4s ease-in-out infinite;
-}
-
-#workspaces button.empty:not(.active) {
-    opacity: 0.24;
+    background-color: @red;
+    color: @bg;
+    animation: pulse-urgent 1.6s ease-in-out infinite;
 }
 
 #workspaces button:hover,
@@ -178,131 +200,180 @@ window#waybar > box {
     outline: none;
 }
 
-@keyframes urgent-pulse {
-    0% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.55;
-    }
+@keyframes pulse-urgent {
+    0%   { background-color: @red; }
+    50%  { background-color: rgba(255, 128, 128, 0.45); }
+    100% { background-color: @red; }
 }
 
-/* Window Title ---------------------------------------*/
+/* Window title -------------------------------------------------------*/
 #window {
-    font-size: 11px;
-    font-weight: 600;
-    color: @text;
-    opacity: 0.85;
+    color: #a0a0a0;
+    font-size: 11.5px;
+    font-weight: 500;
 }
 
 #window:hover {
-    opacity: 1;
+    color: @text;
 }
 
-/* Clock ----------------------------------------------*/
+/* Clock --------------------------------------------------------------*/
 #clock {
+    color: @text;
+    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.5px;
 }
 
 #clock.date {
-    font-weight: 600;
-    opacity: 0.8;
+    color: @muted;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 9px;
+    margin-left: 3px;
 }
 
-#clock.date:hover {
-    opacity: 1;
+/* Media --------------------------------------------------------------*/
+#mpris {
+    color: @soft;
+    font-size: 12px;
 }
 
-/* Stats & States -------------------------------------*/
+#custom-eq {
+    color: @peach;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 0 5px;
+}
+
+#custom-eq label {
+    color: @peach;
+}
+
+#custom-eq.paused,
+#custom-eq.paused label {
+    color: @dim;
+}
+
+#custom-eq.idle {
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    opacity: 0;
+}
+
+/* Weather ------------------------------------------------------------*/
+#custom-weather {
+    color: @muted;
+    font-size: 12px;
+}
+
+#custom-weather label {
+    color: @muted;
+}
+
+#custom-weather:hover label {
+    color: @text;
+}
+
+/* System stats -------------------------------------------------------*/
 #cpu,
 #memory,
 #disk {
-    opacity: 0.85;
-}
-#cpu:hover,
-#memory:hover,
-#disk:hover {
-    opacity: 1;
+    color: @muted;
 }
 
 #cpu.warning,
 #memory.warning,
 #disk.warning {
-    color: @warn;
+    color: @peach;
+    background-color: rgba(255, 199, 153, 0.06);
 }
+
 #cpu.critical,
 #memory.critical,
 #disk.critical {
-    color: @crit;
+    color: @red;
+    background-color: rgba(255, 128, 128, 0.12);
+    animation: pulse-critical 2s ease-in-out infinite;
 }
 
-#battery.good {
-    color: @good;
+@keyframes pulse-critical {
+    0%   { background-color: rgba(255, 128, 128, 0.08); }
+    50%  { background-color: rgba(255, 128, 128, 0.22); }
+    100% { background-color: rgba(255, 128, 128, 0.08); }
 }
-#battery.warning {
-    color: @warn;
+
+/* Audio --------------------------------------------------------------*/
+#pulseaudio {
+    color: @soft;
 }
-#battery.critical {
-    color: @crit;
+
+#pulseaudio.muted,
+#pulseaudio.microphone.muted {
+    color: @red;
+}
+
+/* Network ------------------------------------------------------------*/
+#network {
+    color: @soft;
+    font-size: 12px;
 }
 
 #network.disconnected {
-    color: @crit;
+    color: @red;
 }
 
-#pulseaudio.muted {
-    color: @crit;
+/* Battery (laptop) ---------------------------------------------------*/
+#battery.good {
+    color: @mint;
 }
 
-/* Keyboard State -------------------------------------*/
-#keyboard-state {
-    font-size: 10px;
-    opacity: 0.7;
-}
-#keyboard-state:hover {
-    opacity: 1;
+#battery.warning {
+    color: @peach;
 }
 
-/* Tray ------------------------------------------------*/
-#tray > .passive {
-    opacity: 0.55;
-}
-#tray > .needs-attention {
-    color: @crit;
-    font-weight: 700;
+#battery.critical {
+    color: @red;
+    animation: pulse-critical 2s ease-in-out infinite;
 }
 
+/* Notifications ------------------------------------------------------*/
 #custom-notifications {
-    background: transparent;
-    padding: 3px 6px;
-    margin: 3px 6px 3px 2px;
-    border-radius: 6px;
-    min-width: 28px;
-    box-shadow: none;
-    transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+    color: @muted;
 }
 
-#custom-notifications:hover {
-    background: rgba(255, 248, 232, 0.12);
+#custom-notifications label {
+    color: @muted;
 }
 
 #custom-notifications.notification,
 #custom-notifications.inhibited-notification {
-    background: rgba(224, 190, 115, 0.18);
-    color: @text;
-    box-shadow: none;
+    color: @peach;
+    background-color: rgba(255, 199, 153, 0.12);
+    animation: pulse-notify 2.4s ease-in-out infinite;
+}
+
+#custom-notifications.notification label,
+#custom-notifications.inhibited-notification label {
+    color: @peach;
 }
 
 #custom-notifications.dnd-none,
 #custom-notifications.dnd-notification,
 #custom-notifications.dnd-inhibited-none,
 #custom-notifications.dnd-inhibited-notification {
-    color: @warn;
-    background: rgba(255, 255, 255, 0.05);
+    color: @dim;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+#custom-notifications.dnd-none label,
+#custom-notifications.dnd-notification label,
+#custom-notifications.dnd-inhibited-none label,
+#custom-notifications.dnd-inhibited-notification label {
+    color: @dim;
 }
 
 #custom-notifications.inhibited-none,
@@ -311,40 +382,67 @@ window#waybar > box {
 }
 
 #custom-notifications.cc-open {
-    border-color: rgba(224, 190, 115, 0.42);
-    background: rgba(224, 190, 115, 0.12);
-    box-shadow: none;
+    border-color: rgba(255, 199, 153, 0.42);
+    background-color: rgba(255, 199, 153, 0.12);
 }
 
-/* Focus (Keyboard Nav) -------------------------------*/
+@keyframes pulse-notify {
+    0%   { background-color: rgba(255, 199, 153, 0.10); }
+    50%  { background-color: rgba(255, 199, 153, 0.26); }
+    100% { background-color: rgba(255, 199, 153, 0.10); }
+}
+
+/* Tray ---------------------------------------------------------------*/
+#tray {
+    padding: 0 4px;
+}
+
+#tray > .passive {
+    opacity: 0.45;
+}
+
+#tray > .needs-attention {
+    color: @peach;
+    animation: pulse-notify 2.4s ease-in-out infinite;
+}
+
+/* Keyboard state -----------------------------------------------------*/
+#keyboard-state {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+#keyboard-state:hover {
+    opacity: 1;
+}
+
+/* Focus & tooltips ---------------------------------------------------*/
 button:focus {
-    outline: 2px solid rgba(255, 255, 255, 0.35);
-    outline-offset: 2px;
+    outline: 2px solid rgba(255, 199, 153, 0.55);
+    outline-offset: 1px;
 }
 
-/* Tooltips -------------------------------------------*/
 tooltip {
-    background: rgba(18, 18, 20, 0.94);
-    color: @text;
-    border: 1px solid rgba(255, 248, 232, 0.13);
-    padding: 6px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+    background: rgba(16, 16, 16, 0.98);
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 tooltip label {
-    padding: 0;
-    color: @text;
+    color: @soft;
+    font-size: 11px;
+    font-weight: 500;
 }
 
-/* Optional: remove unwanted spacing between groups */
+/* Trim the outer edges of each island --------------------------------*/
 .modules-left > *:first-child,
 .modules-center > *:first-child,
 .modules-right > *:first-child {
     margin-left: 0;
 }
+
 .modules-left > *:last-child,
 .modules-center > *:last-child,
 .modules-right > *:last-child {

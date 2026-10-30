@@ -63,24 +63,26 @@ hl.config({
   },
 
   decoration = {
-    rounding = 8,
+    rounding = 12,
     active_opacity = 0.92,
     inactive_opacity = 0.86,
     fullscreen_opacity = 1.0,
 
     blur = {
       enabled = true,
+      variant = "frost",
       size = 8,
       passes = 2,
       new_optimizations = true,
       ignore_opacity = true,
-      noise = 0.02,
-      contrast = 0.95,
-      brightness = 0.9,
+      noise = 0.005,
+      contrast = 1.0,
+      brightness = 1.0,
       vibrancy = 0.2,
       vibrancy_darkness = 0.0,
       popups = true,
       popups_ignorealpha = 0.6,
+
     },
 
     shadow = {
@@ -172,12 +174,11 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("vicinae server")
   hl.exec_cmd("nm-applet")
   hl.exec_cmd("hypridle")
-  hl.exec_cmd("swaync")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
   hl.exec_cmd("gnome-keyring-daemon --start --components=secrets")
   hl.exec_cmd([[gsettings set org.gnome.desktop.interface color-scheme "prefer-dark"]])
   hl.exec_cmd([[gsettings set org.gnome.desktop.interface gtk-theme "adw-gtk3-dark"]])
-  hl.exec_cmd("waybar")
+  hl.exec_cmd("qs")
 end)
 
 hl.on("window.update_rules", function(window)
@@ -196,7 +197,8 @@ hl.on("window.update_rules", function(window)
 end)
 
 bind_exec(main_mod .. " + SHIFT + C", home .. "/.local/bin/toggle-warp")
-bind_exec(main_mod .. " + SHIFT + Z", "pkill waybar && waybar")
+bind_exec(main_mod .. " + C", "qs ipc call shell toggleCalendar")
+bind_exec(main_mod .. " + SHIFT + Z", "pkill -x qs; sleep 0.3; qs")
 bind_exec(main_mod .. " + SHIFT + S", home .. "/.local/bin/sul-uploader")
 bind_exec(main_mod .. " + SHIFT + G", home .. "/.local/bin/osu-gamma")
 
@@ -207,11 +209,11 @@ bind_exec(main_mod .. " + E", file_manager)
 bind_exec(main_mod .. " + B", browser)
 hl.bind(main_mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 bind_exec(main_mod .. " + R", menu)
-bind_exec(main_mod .. " + N", "swaync-client -t -sw")
+bind_exec(main_mod .. " + N", "qs ipc call notifications toggleCenter")
 bind_exec(main_mod .. " + D", "vopono exec discord -p mullvad -c wireguard -s canada")
 hl.bind(main_mod .. " + SHIFT + bracketleft", hl.dsp.dpms(false))
 hl.bind(main_mod .. " + SHIFT + bracketright", hl.dsp.dpms(true))
-bind_exec(main_mod .. " + SHIFT + N", "swaync-client -d -sw")
+bind_exec(main_mod .. " + SHIFT + N", "qs ipc call notifications toggleDnd")
 hl.bind(main_mod .. " + P", hl.dsp.window.pseudo({ action = "toggle" }))
 hl.bind(main_mod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(main_mod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
@@ -260,17 +262,10 @@ end)
 hl.bind("XF86AudioPlay", hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "M", window = "class:^(discord)$" }))
 hl.bind("XF86AudioPause", hl.dsp.send_shortcut({ mods = "CTRL SHIFT", key = "M", window = "class:^(discord)$" }))
 
-hl.window_rule({
-  match = {
-    class = "^$",
-    title = "^$",
-    xwayland = true,
-    float = true,
-    fullscreen = false,
-    pin = false,
-  },
-  no_initial_focus = true,
-})
+hl.bind("Alt + SHIFT + Return", hl.dsp.global("afogados:overlay_chat"))
+hl.bind("CTRL + ALT + R", hl.dsp.global("com.a2tools.dps-meter:reset"))
+hl.bind("CTRL + ALT + Up", hl.dsp.global("com.a2tools.dps-meter:toggle"))
+hl.bind("CTRL + ALT + L", hl.dsp.global("com.a2tools.dps-meter:lock"))
 
 hl.window_rule({
   match = { fullscreen_state_client = 2 },
@@ -410,6 +405,18 @@ hl.window_rule({
   float = true,
 })
 
+hl.window_rule({
+    name = "aion-dps-meter",
+    match = {
+        class = "^(a2tools\\-dps\\-meter)$",
+    },
+    float = true,
+    pin = true,
+    no_blur = true,
+    no_shadow = true,
+    border_size = 0,
+})
+
 hl.layer_rule({
   name = "wofi-style",
   match = { namespace = "wofi" },
@@ -435,10 +442,34 @@ hl.layer_rule({
   ignore_alpha = 0.35,
 })
 
+-- Quickshell "Vesper Islands": translucent dark glass, blurred by the compositor.
+-- ignore_alpha 0.5 → only the glass body (α ≈ .7+) is blurred, never the
+-- anti-aliased edge pixels or the outer ring (that was the white halo).
 hl.layer_rule({
-  name = "waybar-anim",
-  match = { namespace = "waybar" },
-  animation = "slidevert",
+  name = "quickshell-bar",
+  match = { namespace = "quickshell-bar" },
+  animation = "slide top",
+  blur = true,
+  blur_popups = true,
+  ignore_alpha = 0.5,
+})
+
+-- popups animate their own card in QML; compositor animation would double it
+hl.layer_rule({
+  name = "quickshell-popups",
+  match = { namespace = "^quickshell-(volume|network|notifications|sysmon|calendar|weather|player|toasts|overview)$" },
+  no_anim = true,
+  blur = true,
+  blur_popups = true,
+  ignore_alpha = 0.5,
+})
+
+-- snip (screenshot overlay): must appear instantly — a fade would show the
+-- live screen behind the frozen frame. Overlay layer keeps it above fullscreen.
+hl.layer_rule({
+  name = "snip-overlay",
+  match = { namespace = "^snip$" },
+  no_anim = true,
 })
 
 hl.layer_rule({

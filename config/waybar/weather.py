@@ -4,21 +4,21 @@ import json
 import requests
 from datetime import datetime
 
-# Define colors for Pango markup
-COLOR_CITY_TEMP = "#FFA500"  # Orange
-COLOR_FEELS_LIKE = "#FF8C00"  # DarkOrange
-COLOR_WIND = "#87CEEB"  # SkyBlue
-COLOR_HUMIDITY = "#90EE90"  # PaleGreen
+# Vesper palette for Pango markup
+COLOR_CITY_TEMP = "#ffc799"  # peach
+COLOR_FEELS_LIKE = "#ffcfa8"  # peach (hover)
+COLOR_WIND = "#9db2e8"  # blue
+COLOR_HUMIDITY = "#99ffe4"  # mint
 
-COLOR_DATE_HEADER = "#81D4FA"  # Light Blue
-COLOR_MAX_TEMP = "#FF6347"  # Tomato
-COLOR_MIN_TEMP = "#1E90FF"  # DodgerBlue
-COLOR_SUNRISE = "#FFD700"  # Gold
-COLOR_SUNSET = "#9370DB"  # MediumPurple
+COLOR_DATE_HEADER = "#ffc799"  # peach
+COLOR_MAX_TEMP = "#ff8080"  # red
+COLOR_MIN_TEMP = "#74c9e8"  # cyan
+COLOR_SUNRISE = "#ffcfa8"  # peach (hover)
+COLOR_SUNSET = "#d290df"  # magenta
 
-COLOR_HOURLY_ICON = "#87CEFA"  # LightSkyBlue
-COLOR_HOURLY_TEMP = "#F4A460"  # SandyBrown
-COLOR_CHANCES = "#DEB887"  # Burlywood
+COLOR_HOURLY_ICON = "#8b8b8b"  # muted
+COLOR_HOURLY_TEMP = "#ffc799"  # peach
+COLOR_CHANCES = "#99ffe4"  # mint
 
 WEATHER_CODES = {
     "113": "\uf185",  #   (sun)

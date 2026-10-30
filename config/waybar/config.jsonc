@@ -1,10 +1,10 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 32,
-  "margin-top": 8,
-  "margin-left": 8,
-  "margin-right": 8,
+  "height": 40,
+  "margin-top": 6,
+  "margin-left": 10,
+  "margin-right": 10,
   "spacing": 4,
   "fixed-center": true,
   "gtk-layer-shell": true,
@@ -14,7 +14,7 @@
 
   // Module layout - optimized for readability
   "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["clock", "clock#date", "mpris", "custom/weather"],
+  "modules-center": ["clock", "clock#date", "custom/eq", "mpris", "custom/weather"],
   "modules-right": [
     "custom/notifications",
     "tray",
@@ -39,7 +39,7 @@
   // Window title - elegant and informative
   "hyprland/window": {
     "format": "{}",
-    "max-length": 50,
+    "max-length": 44,
     "separate-outputs": false,
     "rewrite": {
       "(.*) — Mozilla Firefox": "󰈹 $1",
@@ -231,6 +231,13 @@
     "on-scroll-down": "playerctl volume 0.1-",
     "smooth-scrolling-threshold": 1,
     "tooltip-format": "{player}: {title} - {artist}\nAlbum: {album}",
+  },
+
+  // Now-playing indicator - animated equalizer, hidden when nothing plays
+  "custom/eq": {
+    "exec": "~/.config/waybar/scripts/eq.sh",
+    "return-type": "json",
+    "tooltip": false,
   },
 
   // Battery (if laptop)

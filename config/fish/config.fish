@@ -8,6 +8,8 @@ set -gx PATH /usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin $PATH
 
 alias paru="yay"
 alias lg="lazygit"
+alias oc="opencode"
+alias cdx="codex"
 
 # adições de binários locais
 fish_add_path -g ~/.local/bin
@@ -58,3 +60,7 @@ end
 
 # Pi
 fish_add_path "/home/maoto/.npm-global/bin"
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/home/maoto/.local/bin" $PATH
