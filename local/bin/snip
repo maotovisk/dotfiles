@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+#
+# snip — freeze every monitor, select a region, annotate, export.
+#
+# Overlay UI lives in ~/.config/snip (Quickshell). This script grabs all
+# outputs first (so the frozen frame is the moment you pressed the key),
+# then hands them to the overlay.
+#
+# Usage:
+#   snip [-o FILE]
+#
+# Writes the PNG to FILE and prints the chosen action on stdout
+# (default ~/Pictures/Screenshots/Screenshot_<date>.png):
+#   upload   Enter / Upload button   (caller decides what uploading means)
+#   copy     Ctrl+C                  (image is already on the clipboard)
+#   save     Ctrl+S
+# Exit status: 0 accepted, 1 cancelled, 2 error/already running.
+#
+# Dependencies: quickshell (qs), grim, hyprctl, jq, wl-copy.
+
+set -u
+
+CONFIG_DIR="${SNIP_CONFIG_DIR:-$HOME/.config/snip}"
+out=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -o|--output) [ $# -ge 2 ] || { echo "snip: $1 needs a path" >&2; exit 2; }; out="$2"; shift 2 ;;
+        --output=*) out="${1#--output=}"; shift ;;
+        -h|--help) sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+        *) echo "snip: unknown option: $1" >&2; exit 2 ;;
+    esac
+done
+
+if [ -z "$out" ]; then
+    out="${XDG_PICTURES_DIR:-$HOME/Pictures}/Screenshots/Screenshot_$(date +'%Y-%m-%d %H-%M-%S').png"
+fi
+mkdir -p "$(dirname "$out")"
+
+runtime="${XDG_RUNTIME_DIR:-/tmp}"
+
+# one overlay at a time; a second keypress while it's up does nothing
+exec 9>"$runtime/snip.lock"
+flock -n 9 || exit 2
+
+dir="$(mktemp -d "$runtime/snip.XXXXXX")" || exit 2
+trap 'rm -rf "$dir"' EXIT
+
+monitors="$(hyprctl -j monitors)" || exit 2
+
+# freeze: all outputs in parallel, before anything else
+pids=()
+while read -r name; do
+    grim -o "$name" "$dir/$name.png" & pids+=("$!")
+done < <(jq -r '.[].name' <<<"$monitors")
+for p in "${pids[@]}"; do wait "$p" || exit 2; done
+
+# windows on the visible workspaces (incl. an open special one), most recent focus first
+hyprctl -j clients | jq --argjson m "$monitors" '
+    ([ $m[] | .activeWorkspace.id, (.specialWorkspace.id // empty) ]) as $ws
+    | [ .[] | select(.mapped and (.hidden | not) and (.workspace.id as $id | $ws | index($id)))
+      | { x: .at[0], y: .at[1], w: .size[0], h: .size[1], title, class, focus: .focusHistoryID } ]
+    | sort_by(.focus)' >"$dir/windows.json" 2>/dev/null || echo '[]' >"$dir/windows.json"
+
+SNIP_DIR="$dir" SNIP_OUT="$out" qs -p "$CONFIG_DIR" >"$dir/qs.log" 2>&1 9>&-
+status=$?
+[ -n "${SNIP_LOG:-}" ] && cp "$dir/qs.log" "$SNIP_LOG"
+
+# the overlay writes the chosen action only after the PNG is saved
+action="$(cat "$dir/action" 2>/dev/null)"
+
+if [ -z "$action" ]; then
+    if [ "$status" -ne 0 ]; then
+        echo "snip: overlay failed (status $status):" >&2
+        tail -n 20 "$dir/qs.log" >&2
+        exit 2
+    fi
+    exit 1
+fi
+
+if [ "$action" = copy ]; then
+    wl-copy --type image/png <"$out" 9>&-  # don't let the clipboard daemon inherit the lock
+fi
+echo "$action"
+exit 0

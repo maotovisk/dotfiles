@@ -509,6 +509,8 @@ write_uploader() {
 # from the list below is used automatically.
 #
 # Supported backends (--list-backends):
+#   snip             Frozen multi-monitor overlay: select, annotate, then
+#                    Upload (Enter) / Copy (Ctrl+C) / Save (Ctrl+S)
 #   hyprland-satty   Hyprland focused monitor (grim) + satty annotation
 #   grim-slurp       Wayland region select (grim + slurp, satty if present)
 #   spectacle        KDE Spectacle region capture
@@ -521,7 +523,7 @@ write_uploader() {
 # Config (~/.config/sul-uploader/config.ini):
 #   [DEFAULT]
 #   key=YOUR_S_UL_API_KEY
-#   backend=hyprland-satty
+#   backend=snip
 #
 # Dependencies (common): curl, jq, file, notify-send, zenity (or kdialog),
 #   wl-copy (or xclip) — plus whichever backend tools you use.
@@ -532,7 +534,7 @@ APP_NAME="Screenshot Uploader"
 CONFIG_FILE="$HOME/.config/sul-uploader/config.ini"
 STORE_DIR="$HOME/s-ul"
 
-BACKENDS="hyprland-satty grim-slurp spectacle flameshot gnome"
+BACKENDS="snip hyprland-satty grim-slurp spectacle flameshot gnome"
 
 usage() {
     sed -n '2,/^$/p' "$0" | sed 's/^# \{0,1\}//'
@@ -542,6 +544,7 @@ command_exists() { command -v "$1" >/dev/null 2>&1; }
 
 backend_label() {
     case "$1" in
+        snip)           echo "snip (frozen overlay + annotate)" ;;
         hyprland-satty) echo "Hyprland (grim + satty)" ;;
         grim-slurp)     echo "Wayland region (grim + slurp)" ;;
         spectacle)      echo "KDE Spectacle" ;;
@@ -555,6 +558,7 @@ backend_label() {
 # used for annotation when present, skipped otherwise).
 backend_commands() {
     case "$1" in
+        snip)           echo "snip qs hyprctl grim jq" ;;
         hyprland-satty) echo "hyprctl grim satty" ;;
         grim-slurp)     echo "grim slurp" ;;
         spectacle)      echo "spectacle" ;;
@@ -671,6 +675,14 @@ _copy_url() {
     fi
 }
 
+# Backends that let the user pick what happens set CAPTURE_ACTION:
+# upload (skip the confirm dialog), copy or save (no upload). Empty = ask.
+CAPTURE_ACTION=""
+
+capture_snip() {
+    CAPTURE_ACTION="$(snip --output "$1")"
+}
+
 capture_hyprland_satty() {
     local file="$1" monitor=""
     monitor="$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name')"
@@ -739,6 +751,7 @@ filename="Screenshot_$current_date.png"
 complete_path="${STORE_DIR}/${filename}"
 
 case "$BACKEND" in
+    snip)           capture_snip "$complete_path" || true ;;
     hyprland-satty) capture_hyprland_satty "$complete_path" || true ;;
     grim-slurp)     capture_grim_slurp "$complete_path" || true ;;
     spectacle)      capture_spectacle "$complete_path" || true ;;
@@ -752,8 +765,19 @@ if [ ! -f "$complete_path" ] || [ "$(file --mime-type -b "$complete_path")" != "
     exit 0
 fi
 
-# Ask user if they want to upload
-if ! _confirm "Upload the screenshot to s-ul.eu?"; then
+case "$CAPTURE_ACTION" in
+    copy)
+        # image is on the clipboard; nothing to keep
+        rm -f "$complete_path"
+        _notify "Screenshot copied to clipboard"
+        exit 0 ;;
+    save)
+        _notify "Screenshot saved" "$complete_path"
+        exit 0 ;;
+esac
+
+# Ask user if they want to upload (unless they already chose Upload)
+if [ "$CAPTURE_ACTION" != upload ] && ! _confirm "Upload the screenshot to s-ul.eu?"; then
     _notify "Upload canceled by user"
     exit 0
 fi
