@@ -69,6 +69,9 @@ PanelWindow {
             highlighted: Ui.popup === "weather"
             onClicked: Ui.toggle("weather")
         }
+
+        Divider { visible: badges.visible }
+        LauncherBadges { id: badges; anchors.verticalCenter: parent.verticalCenter }
     }
 
     // ── right: bell · tray · stats · net · bluetooth · volume · mic ────────────────
