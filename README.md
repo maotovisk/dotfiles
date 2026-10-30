@@ -8,24 +8,25 @@ A comprehensive Arch Linux dotfiles setup featuring Hyprland compositor with a m
 
 ## 🎨 Features
 
-- **Hyprland**: Wayland compositor with smooth animations
+- **Hyprland**: Wayland compositor (0.55+ Lua config) with smooth animations
+- **Quickshell "Vesper Islands"**: floating glass-island bar with popouts for audio, network, weather, calendar, system monitor, media and a notification center
+- **snip**: Spectacle-style screenshot overlay — freezes every monitor, select/annotate/crop on the spot, then upload, copy or save
 - **Fish Shell**: User-friendly shell with intelligent autocompletions
-- **Waybar**: Highly customizable status bar
 - **Wofi**: Application launcher for Wayland
-- **Mako**: Lightweight notification daemon
-- **Custom Screenshot Uploader**: Upload screenshots to s-ul.eu with one command
+- **Custom Screenshot Uploader**: Upload screenshots to s-ul.eu with one keypress
 
 ## 📦 What's Included
 
 ### Core Components
 - **Hyprland** configuration with optimized settings
+- **Quickshell** bar, popups, toasts and notification center (Vesper palette: dark translucent glass, peach accent, Instrument Sans)
 - **Fish** shell configuration with custom functions
-- **Waybar** status bar with system monitoring
 - **Wofi** application launcher styling
-- **Mako** notification system configuration
+- **Waybar** / **Mako** configs, kept as fallbacks (restyled with the same Vesper palette)
 
 ### Additional Tools
-- **sul-uploader**: Custom screenshot uploader for s-ul.eu
+- **snip**: frozen-screen capture + annotation overlay (Quickshell)
+- **sul-uploader**: Custom screenshot uploader for s-ul.eu (uses snip by default)
 - **Wallpapers**: Curated collection of desktop wallpapers
 - **Font configurations**: Inter, JetBrains Mono, Fira Code, and Nerd Fonts
 
@@ -76,11 +77,14 @@ maot_dots/
 ├── config/                 # Application configurations
 │   ├── fish/              # Fish shell config
 │   ├── hypr/              # Hyprland config
-│   ├── mako/              # Notification daemon config
-│   ├── waybar/            # Status bar config
+│   ├── mako/              # Fallback notification daemon config
+│   ├── quickshell/        # Vesper Islands bar (QML)
+│   ├── snip/              # Screenshot overlay (QML)
+│   ├── waybar/            # Fallback status bar config
 │   └── wofi/              # Application launcher config
 ├── local/
 │   └── bin/
+│       ├── snip           # Freeze + annotate launcher
 │       └── sul-uploader   # Screenshot uploader script
 ├── wallpapers/            # Desktop wallpapers
 ├── install_fresh.sh       # Main installation script
@@ -100,7 +104,7 @@ curl -fsSL https://raw.githubusercontent.com/maotovisk/dotfiles/main/install-sul
 ```
 
 It detects your desktop and installed screenshot tools, lets you pick which
-backend `sul-uploader` should use (Hyprland grim+satty, grim+slurp, KDE
+backend `sul-uploader` should use (snip when the dotfiles are installed, Hyprland grim+satty, grim+slurp, KDE
 Spectacle, Flameshot, or GNOME Screenshot — suggested automatically, e.g.
 Spectacle on KDE), installs dependencies (asks first), drops `sul-uploader`
 into `~/.local/bin`, and walks you through creating
@@ -135,10 +139,12 @@ The Hyprland configuration includes optimized keybindings. Check `config/hypr/` 
 
 ### Core Desktop Environment
 - `hyprland` - Wayland compositor
-- `waybar` - Status bar
+- `quickshell` - Bar, popups, notifications and the snip overlay
+- `grim`, `slurp`, `satty` - Screen capture (snip + fallback backends)
 - `wofi` - Application launcher
-- `mako` - Notifications
+- `mako`, `waybar` - Fallback notifications / bar
 - `fish` - Shell
+- Instrument Sans - UI font (downloaded from google/fonts by `install_fresh.sh`)
 
 ### Complete Installation Extras
 - **Development**: Docker, Zed Editor, Visual Studio Code
@@ -150,12 +156,25 @@ The Hyprland configuration includes optimized keybindings. Check `config/hypr/` 
 ## 🎯 Usage
 
 ### Taking Screenshots
-```bash
-# Take a region screenshot and upload to s-ul.eu
-sul-uploader
-```
 
-The screenshot will be automatically uploaded and the URL copied to your clipboard.
+`Super + Shift + S` runs `sul-uploader`, which opens **snip**: both monitors
+freeze instantly (it sits on the Overlay layer, so it works over fullscreen
+games too) and you work on the frozen frame.
+
+| Action | How |
+| --- | --- |
+| Select a region | Drag (can span monitors); resize with the handles, drag inside to move |
+| Select a window / monitor | Click it; `F` = monitor under cursor, `Ctrl+A` = all monitors |
+| Tools | `S` select · `P` pen · `L` line · `A` arrow · `R` rectangle · `E` ellipse · `H` highlighter · `T` text · `N` numbered marker · `B` pixelate |
+| Colour / size | `1`–`8` · `[` `]` — `Shift` snaps lines to 45° and shapes to squares |
+| Undo / redo | `Ctrl+Z` · `Ctrl+Shift+Z` |
+| **Upload** | `Enter` or double-click the selection — URL lands on the clipboard |
+| Copy image only | `Ctrl+C` |
+| Save only | `Ctrl+S` (kept in `~/s-ul`) |
+| Cancel | `Esc` (right-click clears the selection first) |
+
+`snip -o file.png` also works on its own and prints the chosen action
+(`upload`, `copy` or `save`).
 
 ### Shell Features
 Fish shell comes pre-configured with:

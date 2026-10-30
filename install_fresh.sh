@@ -56,7 +56,19 @@ DEPENDENCIES="git base-devel fish curl jq wl-clipboard"
 
 HYPRLAND_PACKAGES="hyprland aquamarine xdg-desktop-portal-hyprland hyprpaper hyprland-qtutils hyprlang hyprland-qt-support hyprcursor hyprutils hyprgraphics"
 
-EXTRA_PACKAGES="waybar wofi mako"
+# quickshell runs the Vesper Islands bar and the snip screenshot overlay;
+# waybar stays as a fallback bar
+EXTRA_PACKAGES="quickshell grim slurp satty wofi mako waybar"
+
+install_fonts() {
+    # Instrument Sans (Quickshell UI font) has no repo package; take it from google/fonts
+    local dir="$HOME/.local/share/fonts/instrument-sans" base="https://github.com/google/fonts/raw/main/ofl/instrumentsans"
+    mkdir -p "$dir"
+    curl -fsSL -o "$dir/InstrumentSans[wdth,wght].ttf" "$base/InstrumentSans%5Bwdth,wght%5D.ttf" &&
+        curl -fsSL -o "$dir/InstrumentSans-Italic[wdth,wght].ttf" "$base/InstrumentSans-Italic%5Bwdth,wght%5D.ttf" &&
+        fc-cache -f "$dir" >/dev/null && print_info "Instrument Sans installed." ||
+        print_warn "Could not download Instrument Sans; the bar will fall back to another font."
+}
 
 install_yay() {
     print_info "Installing yay (Yet Another Yaourt)..."
@@ -148,6 +160,9 @@ install_deps() {
 
     print_info "Installing extra packages..."
     install_package "$EXTRA_PACKAGES"
+
+    print_info "Installing fonts..."
+    install_fonts
 
     print_info "Installing yay (AUR helper)..."
     install_yay

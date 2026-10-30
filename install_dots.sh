@@ -47,7 +47,7 @@ function install_config_files() {
     print_info "Installing config files from $DOTFILES_DIR/config"
 
     # Symlink config folders
-    CONFIGS=(fish hypr mako waybar wofi)
+    CONFIGS=(fish hypr mako quickshell waybar wofi snip)
     for config in "${CONFIGS[@]}"; do
         symlink "$DOTFILES_DIR/config/$config" "$HOME/.config/$config"
     done
@@ -61,6 +61,10 @@ function install_sul_uploader() {
     symlink "$DOTFILES_DIR/local/bin/sul-uploader" "$HOME/.local/bin/sul-uploader"
     chmod +x "$HOME/.local/bin/sul-uploader"
 
+    # snip: frozen-screen capture overlay (sul-uploader's default backend)
+    symlink "$DOTFILES_DIR/local/bin/snip" "$HOME/.local/bin/snip"
+    chmod +x "$HOME/.local/bin/snip"
+
     # Handle sul-uploader config separately
     SUL_UPLOADER_DIR="$HOME/.config/sul-uploader"
     mkdir -p "$SUL_UPLOADER_DIR"
@@ -73,7 +77,7 @@ function install_sul_uploader() {
         print_info "Get your key from https://s-ul.eu/account/preferences and paste it below."
         read -p "Enter the key for sul-uploader: " SUL_KEY
         # backend= left empty: sul-uploader auto-detects the best installed
-        # backend at runtime (or set one: hyprland-satty|grim-slurp|spectacle|flameshot|gnome).
+        # backend at runtime (or set one: snip|hyprland-satty|grim-slurp|spectacle|flameshot|gnome).
         printf '[DEFAULT]\nkey=%s\nbackend=\n' "$SUL_KEY" > "$CONFIG_INI"
         print_info "Created $CONFIG_INI"
     fi
