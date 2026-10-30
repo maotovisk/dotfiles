@@ -8,7 +8,7 @@ Singleton {
     id: root
 
     property var bar: null                   // the bar PanelWindow (focus grabs include it)
-    property string popup: ""                // "" | volume | network | notifs | sysmon | calendar | weather | player | overview
+    property string popup: ""                // "" | volume | network | notifs | sysmon | calendar | weather | player | overview | share
     property bool wsHovered: false           // pointer over the workspace pills (opens the overview)
     property string volumeTab: "output"      // output | input
     property string networkTab: "wifi"       // wifi | bluetooth
@@ -42,5 +42,12 @@ Singleton {
         if (name.includes("://"))
             return name
         return Quickshell.iconPath(name, true)
+    }
+
+    // window class → its desktop entry's icon
+    function appIcon(cls) {
+        if (!cls)
+            return ""
+        return icon(DesktopEntries.heuristicLookup(cls)?.icon ?? cls.toLowerCase())
     }
 }

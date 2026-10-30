@@ -22,6 +22,7 @@ ShellRoot {
     PlayerPopup { screen: shell.screen }
     SysMonitor { screen: shell.screen }
     Overview { screen: shell.screen }
+    SharePicker { screen: shell.screen }
     Toasts { screen: shell.screen }
 
     // services that should start with the shell, not on first use

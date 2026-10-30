@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Wayland
+import Quickshell.Hyprland
 import qs.common
 import qs.components
 import qs.services
@@ -77,6 +78,20 @@ PanelWindow {
         anchors.rightMargin: Theme.edge
         anchors.verticalCenter: parent.verticalCenter
         lit: ["volume", "notifs", "network", "sysmon"].includes(Ui.popup)
+
+        // a workspace parked on a SHARE-* headless output (qs-share-picker): click brings it back
+        Chip {
+            id: sharing
+            readonly property var out: Hyprland.monitors.values.find(m => m.name.startsWith("SHARE-")) ?? null
+            visible: !!out
+            anchors.verticalCenter: parent.verticalCenter
+            icon: hovered ? "undo-2" : "screen-share"
+            iconColor: Theme.mint
+            text: out && out.activeWorkspace ? "ws " + out.activeWorkspace.id : ""
+            textColor: Theme.mint
+            onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/qs-share-picker", "--stop"])
+        }
+        Divider { visible: sharing.visible }
 
         Chip {
             anchors.verticalCenter: parent.verticalCenter

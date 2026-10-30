@@ -35,12 +35,16 @@ hl.workspace_rule({ workspace = "1", monitor = "DP-2" })
 hl.workspace_rule({ workspace = "2", monitor = "DP-1" })
 
 hl.env("MOZ_ENABLE_WAYLAND", "1")
-hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
+hl.env("QT_QPA_PLATFORMTHEME", "kde")
 hl.env("QT_QPA_PLATFORM", "wayland")
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
 hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("XDG_MENU_PREFIX", "plasma-")
 hl.env("XDG_SESSION_TYPE", "wayland")
+hl.env("GTK_IM_MODULE", "fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("XMODIFIERS", "@im=fcitx")
+hl.env("SDL_IM_MODULE", "fcitx")
 hl.env("PROTON_FSR4_UPGRADE", "1")
 hl.env("XCURSOR_THEME", "breeze_cursors")
 hl.env("XCURSOR_SIZE", "24")
@@ -70,19 +74,27 @@ hl.config({
 
     blur = {
       enabled = true,
-      variant = "frost",
-      size = 8,
+      variant = "haze",
+      size = 6,
       passes = 2,
       new_optimizations = true,
       ignore_opacity = true,
-      noise = 0.005,
-      contrast = 1.0,
-      brightness = 1.0,
-      vibrancy = 0.2,
-      vibrancy_darkness = 0.0,
+      noise = 0.0,
+      contrast = 0.95,
+      brightness = 1.05,
+      vibrancy = 0.3,
+      vibrancy_darkness = 0.1,
       popups = true,
       popups_ignorealpha = 0.6,
 
+      -- Liquid glass: clear centre, refractive lens rim, faint colour fringing
+      acrylic = {
+        refraction = 18,
+        bulb = 36,
+        clarity = 0.92,
+        aberration = 0.012,
+        tint = "rgba(ffffff0d)",
+      },
     },
 
     shadow = {
@@ -169,6 +181,7 @@ hl.animation({ leaf = "workspacesOut", enabled = true, speed = 5, bezier = "ease
 hl.animation({ leaf = "zoomFactor", enabled = true, speed = 7, bezier = "quick" })
 
 hl.on("hyprland.start", function()
+  hl.exec_cmd("fcitx5 -d --replace")
   hl.exec_cmd("xrandr --output DP-2 --primary")
   hl.exec_cmd("hyprpaper")
   hl.exec_cmd("vicinae server")
@@ -452,11 +465,19 @@ hl.layer_rule({
 -- popups animate their own card in QML; compositor animation would double it
 hl.layer_rule({
   name = "quickshell-popups",
-  match = { namespace = "^quickshell-(volume|network|notifications|sysmon|calendar|weather|player|toasts|overview)$" },
+  match = { namespace = "^quickshell-(volume|network|notifications|sysmon|calendar|weather|player|toasts|share)$" },
   no_anim = true,
   blur = true,
   blur_popups = true,
   ignore_alpha = 0.5,
+})
+
+-- overview: a full-height black→clear gradient; blur would cut a hard edge
+-- where the gradient crosses ignore_alpha
+hl.layer_rule({
+  name = "quickshell-overview",
+  match = { namespace = "^quickshell-overview$" },
+  no_anim = true,
 })
 
 -- snip (screenshot overlay): must appear instantly — a fade would show the

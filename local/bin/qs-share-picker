@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# xdph custom_picker_binary. Hands the choice to the Quickshell share picker
+# (config/quickshell/popups/SharePicker.qml) and prints xdph's answer:
+#   [SELECTION]<flags>/screen:<output> | /window:<handle>      (flag r = restore token)
+# Falls back to hyprland-share-picker when the shell isn't running.
+#
+# Workspaces can't be shared by xdph directly. We park the workspace on a
+# headless output "SHARE-<origin>" (far off-screen, the pointer can't reach it)
+# and share that output. `qs-share-picker --stop` puts it back.
+#
+# xdph runs us with a trimmed environment: set what qs/hyprctl need ourselves.
+export PATH="$HOME/.local/bin:/usr/local/bin:/usr/bin:$PATH"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+if [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ] || [ "$HYPRLAND_INSTANCE_SIGNATURE" = 0 ]; then
+    HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$XDG_RUNTIME_DIR/hypr" 2>/dev/null | head -1)
+    export HYPRLAND_INSTANCE_SIGNATURE
+fi
+
+lua() { hyprctl -q eval "$1"; }
+
+stop_sharing() {
+    for mon in $(hyprctl monitors -j | jq -r '.[].name | select(startswith("SHARE-"))'); do
+        origin=${mon#SHARE-}
+        for ws in $(hyprctl workspaces -j | jq -r --arg m "$mon" '.[] | select(.monitor == $m and .id > 0) | .id'); do
+            lua "hl.dispatch(hl.dsp.workspace.move({ workspace = '$ws', monitor = '$origin' }))"
+        done
+        hyprctl -q output remove "$mon"
+    done
+}
+
+# park workspace $1 on a fresh headless output, print the output's name
+park_workspace() {
+    local ws=$1 origin mode prev out
+    origin=$(hyprctl workspaces -j | jq -r --argjson id "$ws" '.[] | select(.id == $id) | .monitor')
+    [ -n "$origin" ] || return 1
+    stop_sharing                                   # one shared workspace at a time
+    out="SHARE-$origin"
+    mode=$(hyprctl monitors -j | jq -r --arg m "$origin" '.[] | select(.name == $m) | "\(.width)x\(.height)@60"')
+    prev=$(hyprctl activeworkspace -j | jq -r .id)
+
+    hyprctl -q output create headless "$out" || return 1
+    lua "hl.monitor({ output = '$out', mode = '$mode', position = '-8000x-8000', scale = 1 })"
+    # moving a workspace only makes it active on the target if it was active on
+    # the source: show it first, move it, then come back to where we were
+    # (sharing the current workspace: Hyprland plugs the gap on its own)
+    local back=""
+    [ "$prev" != "$ws" ] && back="hl.dispatch(hl.dsp.focus({ workspace = '$prev' }))"
+    lua "hl.dispatch(hl.dsp.focus({ workspace = '$ws' }))
+         hl.dispatch(hl.dsp.workspace.move({ workspace = '$ws', monitor = '$out' }))
+         $back"
+    echo "$out"
+}
+
+if [ "$1" = --stop ]; then
+    stop_sharing
+    exit 0
+fi
+
+token=0
+for a in "$@"; do [ "$a" = --allow-token ] && token=1; done
+
+dir=$(mktemp -d "$XDG_RUNTIME_DIR/qs-share.XXXXXX") || exit 1
+mkfifo "$dir/answer"
+
+if ! qs ipc call sharepicker pick "$dir/answer" "${XDPH_WINDOW_SHARING_LIST:-}" "$token" >/dev/null 2>&1; then
+    rm -rf "$dir"
+    exec hyprland-share-picker "$@"
+fi
+
+# the shell writes "<flags>/<kind>:<id>", or nothing on cancel
+sel=$(timeout 600 cat "$dir/answer")
+rm -rf "$dir"
+
+case "$sel" in
+    */workspace:*)
+        out=$(park_workspace "${sel#*/workspace:}") || exit 1
+        sel="${sel%%/*}/screen:$out"
+        ;;
+    */screen:* | */window:*) ;;
+    *) exit 1 ;;
+esac
+
+printf '[SELECTION]%s\n' "$sel"
