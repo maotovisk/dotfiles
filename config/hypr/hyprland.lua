@@ -19,7 +19,7 @@ hl.monitor({
   mode = "1920x1080@180",
   position = "0x0",
   scale = 1,
-  vrr = 2,
+  vrr = 0,
   transform = 0,
 })
 
@@ -147,7 +147,7 @@ hl.config({
   },
 
   cursor = {
-    no_hardware_cursors = 2,
+      no_hardware_cursors = 0,
   },
 })
 
@@ -278,6 +278,20 @@ hl.bind("CTRL + ALT + L", hl.dsp.global("com.a2tools.dps-meter:lock"))
 hl.window_rule({
   match = { fullscreen_state_client = 2 },
   immediate = true,
+})
+
+-- Afogados / HTML5 stream fullscreen: keep this window out of the tearing path.
+-- With Aquamarine 0.15.1, immediate presentation + a swapchain reconfigure makes
+-- Hyprland submit ATOMIC_ALLOW_MODESET | PAGE_FLIP_ASYNC, which amdgpu rejects
+-- with EINVAL and retries every frame (visible flicker). Must come after the
+-- generic rule above so the last matching rule wins. Games keep tearing.
+hl.window_rule({
+  name = "no-tearing-afogados",
+  match = {
+    class = "^(afogados)$",
+    fullscreen_state_client = 2,
+  },
+  immediate = false,
 })
 
 hl.window_rule({
@@ -466,6 +480,16 @@ hl.layer_rule({
 hl.layer_rule({
   name = "quickshell-popups",
   match = { namespace = "^quickshell-(volume|network|notifications|sysmon|calendar|weather|player|toasts|share)$" },
+  no_anim = true,
+  blur = true,
+  blur_popups = true,
+  ignore_alpha = 0.5,
+})
+
+-- dock: slides itself in QML; blur only the glass (icons are opaque anyway)
+hl.layer_rule({
+  name = "quickshell-dock",
+  match = { namespace = "^quickshell-dock$" },
   no_anim = true,
   blur = true,
   blur_popups = true,

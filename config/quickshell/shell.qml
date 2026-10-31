@@ -5,6 +5,7 @@ import Quickshell.Io
 import qs.services
 import "bar"
 import "popups"
+import "dock"
 
 // Vesper Islands. Everything lives on the primary display.
 ShellRoot {
@@ -24,6 +25,7 @@ ShellRoot {
     Overview { screen: shell.screen }
     SharePicker { screen: shell.screen }
     Toasts { screen: shell.screen }
+    DockPanel { screen: shell.screen }
 
     // services that should start with the shell, not on first use
     Component.onCompleted: [Notifs.count, Weather.ready, Stats.cpu]
